@@ -1,1 +1,1 @@
-# CSCI-430-Group-3-Project-1
+# CSCI 430 Project 1 - Group 3
