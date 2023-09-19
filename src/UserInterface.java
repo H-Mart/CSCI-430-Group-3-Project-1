@@ -34,12 +34,12 @@ public final class UserInterface {
         while (true) {
 
             // print menu
-            System.out.println("    1. Login as client");
-            System.out.println("    2. Login as manager");
-            System.out.println("    3. Add client");
-            System.out.println("    4. Add product");
-            System.out.println("    5. Print clients");
-            System.out.println("    6. Print products");
+            System.out.println("    1. Add client");
+            System.out.println("    2. Add products");
+            System.out.println("    3. Add products to Client wishlist");
+            System.out.println("    4. Print clients");
+            System.out.println("    5. Print products");
+            System.out.println("    6. Print Client wishlist");
             System.out.println("    0. Exit");
             System.out.print("> ");
 
@@ -48,22 +48,22 @@ public final class UserInterface {
             String input = UserInterface.getUserInput();
             switch (input) {
                 case "1":
-                    UserInterface.asClient();
-                    break;
-                case "2":
-                    UserInterface.asManager();
-                    break;
-                case "3":
                     addClient();
                     break;
-                case "4":
-                    addProduct();
+                case "2":
+                    addProducts();
                     break;
-                case "5":
+                case "3":
+                    addProductsToClientWishlist();
+                    break;
+                case "4":
                     printClients();
                     break;
-                case "6":
+                case "5":
                     printProducts();
+                    break;
+                case "6":
+                    printClientWishlist();
                     break;
                 case "0":
                     System.exit(0);
@@ -73,79 +73,7 @@ public final class UserInterface {
                     break;
             }
         }
-
     }
-
-    private static void asClient() {
-        System.out.println("Please enter your client id: ");
-        String clientId = UserInterface.getUserInput();
-        if (OrderingSystem.instance().getClientById(clientId).isEmpty()) {
-            System.out.println("Client not found");
-            return;
-        }
-        // client menu
-        System.out.println("Logged in as client " + clientId);
-        System.out.println("Please select an option:");
-        while (true) {
-            System.out.println("    1. Add product to wishlist");
-            System.out.println("    2. Remove product from wishlist");
-            System.out.println("    3. View wishlist");
-            System.out.println("    0. Logout");
-            System.out.print("> ");
-
-            String input = UserInterface.getUserInput();
-            switch (input) {
-                case "1":
-                    UserInterface.addProductToWishlist(clientId);
-                    break;
-                case "2":
-                    UserInterface.removeProductFromWishlist(clientId);
-                    break;
-                case "3":
-                    UserInterface.printWishlist(clientId);
-                    break;
-                case "0":
-                    return;
-                default:
-                    System.out.println("Invalid input");
-                    break;
-            }
-        }
-    }
-
-    private static void asManager() {
-        // manager menu
-        System.out.println("Logged in as manager");
-        System.out.println("Please select an option:");
-        while (true) {
-            System.out.println("    1. Add product");
-            System.out.println("    2. Remove product");
-            System.out.println("    3. View products");
-            System.out.println("    0. Logout");
-            System.out.print("> ");
-
-            String input = UserInterface.getUserInput();
-            switch (input) {
-                case "1":
-                    UserInterface.addProduct();
-                    break;
-                case "2":
-                    UserInterface.removeProduct();
-                    break;
-                case "3":
-                    UserInterface.printProducts();
-                    break;
-                case "0":
-                    return;
-                default:
-                    System.out.println("Invalid input");
-                    break;
-            }
-        }
-    }
-
-    // asks user to add a client
-    // then passes the information to the ordering system
 
     /**
      * @precondition none
@@ -158,10 +86,10 @@ public final class UserInterface {
         System.out.print("\nEnter client address: ");
         String address = UserInterface.getUserInput();
 
-        var addedId = OrderingSystem.instance().addClient(name, address);
+        var addedId = Warehouse.instance().addClient(name, address);
 
-        if (OrderingSystem.instance().getClientById(addedId).isPresent()) {
-            System.out.println("\nClient added - " + OrderingSystem.instance().getClientById(addedId).get());
+        if (Warehouse.instance().getClientById(addedId).isPresent()) {
+            System.out.println("\nClient added - " + Warehouse.instance().getClientById(addedId).get());
         } else {
             System.out.println("\nClient not added");
         }
@@ -184,10 +112,10 @@ public final class UserInterface {
         System.out.println("\nEnter product quantity: ");
         int quantity = Integer.parseInt(UserInterface.getUserInput());
 
-        var addedId = OrderingSystem.instance().addProduct(name, price, quantity);
+        var addedId = Warehouse.instance().addProduct(name, price, quantity);
 
-        if (OrderingSystem.instance().getProductById(addedId).isPresent()) {
-            System.out.println("\nProduct added - " + OrderingSystem.instance().getProductById(addedId).get());
+        if (Warehouse.instance().getProductById(addedId).isPresent()) {
+            System.out.println("\nProduct added - " + Warehouse.instance().getProductById(addedId).get());
         } else {
             System.out.println("\nProduct not added");
         }
@@ -208,65 +136,149 @@ public final class UserInterface {
         }
     }
 
-    /**
-     * @precondition none
-     * @postcondition the product is removed from the ordering system
-     */
-//    public static void removeProduct() {
-//        System.out.print("Enter product id: ");
-//        String productId = UserInterface.getUserInput();
-//
-//        OrderingSystem.instance().removeProduct(productId);
-//    }
-    public static void printClients() {
-        var clientIterator = OrderingSystem.instance().getClientIterator();
-        while (clientIterator.hasNext()) {
-            System.out.println(clientIterator.next());
+    public static void addProductsToClientWishlist() {
+        System.out.println("Please enter your client id: ");
+        String clientId = UserInterface.getUserInput();
+        if (Warehouse.instance().getClientById(clientId).isEmpty()) {
+            System.out.println("Client not found");
+            return;
         }
+
+        while (true) {
+            System.out.println("Please enter the product id: ");
+            String productId = UserInterface.getUserInput();
+            if (Warehouse.instance().getProductById(productId).isEmpty()) {
+                System.out.println("Product not found");
+                return;
+            }
+
+            System.out.println("Please enter the quantity: ");
+            int quantity = Integer.parseInt(UserInterface.getUserInput());
+
+            Warehouse.instance().addProductToClientWishlist(clientId, productId, quantity);
+
+            printClientWishlist(clientId);
+
+            System.out.println("\nAdd another product? (y/n)");
+            String input = UserInterface.getUserInput();
+            if (input.equalsIgnoreCase("n")) {
+                break;
+            }
+        }
+    }
+
+    public static void printClients() {
+        var idPadding = 4;
+        var namePadding = 12;
+        var addressPadding = 15;
+        var idHeader = "ID";
+        var nameHeader = "Name";
+        var addressHeader = "Address";
+
+        var idColWidth = idPadding * 2 + idHeader.length();
+        var nameColWidth = namePadding * 2 + nameHeader.length();
+        var addressColWidth = addressPadding * 2 + addressHeader.length();
+
+        String horizontalLine = "-".repeat(idColWidth + nameColWidth + addressColWidth + 4);
+        System.out.println(horizontalLine);
+
+// @formatter:off
+        System.out.printf("|%" + idPadding       + "s" + "%s"  + "%-" + idPadding       + "s" +
+                          "|%" + namePadding     + "s" + "%s"  + "%-" + namePadding     + "s" +
+                          "|%" + addressPadding  + "s" + "%s"  + "%-" + addressPadding  + "s" + "|\n",
+                " ", idHeader, " ",
+                " ", nameHeader, " ",
+                " ", addressHeader, " ");
+// @formatter:on
+
+        System.out.println(horizontalLine);
+
+        var clientIterator = Warehouse.instance().getClientIterator();
+        while (clientIterator.hasNext()) {
+            var client = clientIterator.next();
+            System.out.printf("|%" + (idColWidth - 1) + "s | %-" + (nameColWidth - 1) + "s| %-" + (addressColWidth - 1) + "s|\n",
+                    client.getId(), client.getName(), client.getAddress());
+        }
+        System.out.println(horizontalLine);
     }
 
     public static void printProducts() {
-        var productIterator = OrderingSystem.instance().getProductIterator();
+
+        // amount of padding for each column, on the left and right side of the text
+        var idPadding = 4;
+        var namePadding = 8;
+        var pricePadding = 8;
+        var quantityPadding = 8;
+        var idHeader = "ID";
+        var nameHeader = "Name";
+        var priceHeader = "Price";
+        var quantityHeader = "Quantity";
+
+        var idColWidth = idPadding * 2 + idHeader.length();
+        var nameColWidth = namePadding * 2 + nameHeader.length();
+        var priceColWidth = pricePadding * 2 + priceHeader.length();
+        var quantityColWidth = quantityPadding * 2 + quantityHeader.length();
+
+        String horizontalLine = "-".repeat(idColWidth + nameColWidth + priceColWidth + quantityColWidth + 5);
+        System.out.println(horizontalLine);
+
+// @formatter:off
+        System.out.printf("|%" + idPadding       + "s" + "%s"  + "%-" + idPadding       + "s" +
+                          "|%" + namePadding     + "s" + "%s"  + "%-" + namePadding     + "s" +
+                          "|%" + pricePadding    + "s" + "%s"  + "%-" + pricePadding    + "s" +
+                          "|%" + quantityPadding + "s" + "%s"  + "%-" + quantityPadding + "s" + "|\n",
+                " ", idHeader, " ",
+                " ", nameHeader, " ",
+                " ", priceHeader, " ",
+                " ", quantityHeader, " ");
+// @formatter:on
+
+        System.out.println(horizontalLine);
+
+        var productIterator = Warehouse.instance().getProductIterator();
         while (productIterator.hasNext()) {
-            System.out.println(productIterator.next());
+            var product = productIterator.next();
+            System.out.printf("|%" + (idColWidth - 1) + "s | %-" + (nameColWidth - 1) + "s|%" + (priceColWidth - 1) +
+                            "s |%" + (quantityColWidth - 1) + "s |\n",
+                    product.getId(), product.getName(), product.getPrice(), product.getQuantity());
         }
-
+        System.out.println(horizontalLine);
     }
 
     /**
-     * @param clientId the id of the client to add the product to
-     * @precondition clientId is not null
-     * @postcondition the product is added to the client's wishlist
-     */
-    public static void addProductToWishlist(String clientId) {
-        System.out.print("Enter product id: ");
-        String productId = UserInterface.getUserInput();
-
-        System.out.print("Enter quantity: ");
-        int quantity = Integer.parseInt(UserInterface.getUserInput());
-
-        OrderingSystem.instance().addProductToWishlist(productId, clientId, quantity);
-    }
-
-    /**
-     * @param clientId the id of the client to remove the product from
-     * @precondition clientId is not null
-     * @postcondition the product is removed from the client's wishlist
-     */
-    public static void removeProductFromWishlist(String clientId) {
-        System.out.print("Enter product id: ");
-        String productId = UserInterface.getUserInput();
-
-        OrderingSystem.instance().removeProductFromWishlist(productId, clientId);
-    }
-
-    /**
-     * @param clientId the id of the client to print the wishlist of
-     * @precondition clientId is not null
      * @postcondition the client's wishlist is printed
      */
-    public static void printWishlist(String clientId) {
-        OrderingSystem.instance().printWishlist(clientId);
+    public static void printClientWishlist() {
+        System.out.print("Enter client id: ");
+        String clientId = UserInterface.getUserInput();
+
+        printClientWishlist(clientId);
+    }
+
+    private static void printClientWishlist(String clientId) {
+        var client = Warehouse.instance().getClientById(clientId);
+        if (client.isEmpty()) {
+            System.out.println("Client not found");
+            return;
+        }
+
+        var clientWishlistIterator = client.get().getWishlist().getIterator();
+
+        System.out.println("Current Wishlist: ");
+
+        while (clientWishlistIterator.hasNext()) {
+            var wishlistItem = clientWishlistIterator.next();
+            var product = Warehouse.instance().getProductById(wishlistItem.getProductId());
+
+            if (product.isEmpty()) {
+                System.err.println("The product with id " + wishlistItem.getProductId() + " was not found");
+                return;
+            }
+
+            System.out.println("\tProduct ID: " + wishlistItem.getProductId() + "\n\tProduct Name: "
+                    + product.get().getName() + "\n\tWishlist Quantity: " + wishlistItem.getQuantity());
+            System.out.println();
+        }
     }
 
     // prints a message saying the option is not implemented, for use in stubs

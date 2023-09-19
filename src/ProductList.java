@@ -29,6 +29,8 @@ public class ProductList {
         return Optional.empty();
     }
 
+
+
     public Iterator<Product> getIterator() {
         return productArrayList.iterator();
     }
@@ -38,16 +40,16 @@ public class ProductList {
      * @precondition product is not null
      * @postcondition the product is added to the product list
      */
-    public void addProduct(Product product) {
+    public void insertProduct(Product product) {
         productArrayList.add(product);
     }
 
-    /**
-     * @param productId the id of the product to remove
-     * @precondition productId is not null
-     * @postcondition the product is removed from the product list
-     */
-    public void removeProduct(String productId) {
-        productArrayList.removeIf(product -> product.getId().equals(productId));
+    public boolean productIdInList(String productId) {
+        for (Product product : productArrayList) {
+            if (product.getId().equals(productId)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

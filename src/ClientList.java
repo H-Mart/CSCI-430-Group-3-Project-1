@@ -34,8 +34,17 @@ public class ClientList {
      * @precondition client is not null
      * @postcondition the client is added to the client list
      */
-    public boolean addClient(Client client) {
+    public boolean insertClient(Client client) {
         clientArrayList.add(client);
         return true;
+    }
+
+    public boolean clientIdInList(String clientId) {
+        for (Client client : clientArrayList) {
+            if (client.getId().equals(clientId)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

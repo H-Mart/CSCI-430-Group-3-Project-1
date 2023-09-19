@@ -7,8 +7,8 @@ public class Product {
     private static int nextId = 1;
 
     /**
-     * @param name name of product
-     * @param price price of product
+     * @param name     name of product
+     * @param price    price of product
      * @param quantity quantity of product
      * @postcondition id is set to nextId, nextId is incremented
      */
@@ -28,6 +28,10 @@ public class Product {
 
     public double getPrice() {
         return price;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int getQuantity() {

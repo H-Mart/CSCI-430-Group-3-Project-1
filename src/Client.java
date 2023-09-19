@@ -28,21 +28,20 @@ public class Client {
      * @postcondition the product and quantity are added to the wishlist as a WishlistItem
      */
     public void addToWishlist(Product product, int quantity) {
-        WishlistItem wishlistItem = new WishlistItem(product, quantity);
+        WishlistItem wishlistItem = new WishlistItem(product.getId(), quantity);
         wishlist.addWishlistItem(wishlistItem);
     }
 
     /**
-     * @param productId the id of the product to remove from the wishlist
-     * @precondition productId is not null
-     * @postcondition the product is removed from the wishlist
+     * @param productId  the id of the product to add to the wishlist
+     * @param quantity the quantity of the product to add
+     * @precondition product is not null, quantity is greater than 0
+     * @postcondition the product and quantity are added to the wishlist as a WishlistItem
      */
-    public void removeFromWishlist(String productId) {
-        wishlist.removeWishlistItem(productId);
+    public void addToWishlist(String productId, int quantity) {
+        WishlistItem wishlistItem = new WishlistItem(productId, quantity);
+        wishlist.addWishlistItem(wishlistItem);
     }
-
-
-    // private attribute getters
 
     public String getId() {
         return id;
@@ -56,18 +55,12 @@ public class Client {
         return name;
     }
 
-    public void printWishlist() {
-        var wishlistIterator = wishlist.getIterator();
-        while (wishlistIterator.hasNext()) {
-            System.out.println(wishlistIterator.next());
-        }
+    public Wishlist getWishlist() {
+        return wishlist;
     }
 
     @Override
     public String toString() {
         return "id: " + id + " Name: " + name + " Address: " + address;
     }
-
-
-
 }

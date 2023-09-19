@@ -24,11 +24,21 @@ public class Wishlist {
         return wishlist.iterator();
     }
 
-    /**
-     * @param wishlistItemProductId product id of wishlist item to remove
-     * @postcondition removes wishlist item with matching product id
-     */
-    public void removeWishlistItem(String wishlistItemProductId) {
-        wishlist.removeIf(item -> item.getProductId().equals(wishlistItemProductId));
+    public boolean productInWishlist(String productId) {
+        for (WishlistItem wishlistItem : wishlist) {
+            if (wishlistItem.getProductId().equals(productId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public WishlistItem getWishlistItem(String productId) {
+        for (WishlistItem wishlistItem : wishlist) {
+            if (wishlistItem.getProductId().equals(productId)) {
+                return wishlistItem;
+            }
+        }
+        return null;
     }
 }

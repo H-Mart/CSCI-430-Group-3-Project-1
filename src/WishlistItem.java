@@ -1,30 +1,30 @@
 public final class WishlistItem {
-    private final Product product;
-    private final int quantity;
+    private final String productId;
+    private int quantity;
 
     /**
-     * @param product  The product to be added to the wishlist
-     * @param quantity The quantity of the product to be added to the wishlist
+     * @param productId The id of the product to be added to the wishlist
+     * @param quantity  The quantity of the product to be added to the wishlist
      */
-    public WishlistItem(Product product, int quantity) {
-        this.product = product;
+    public WishlistItem(String productId, int quantity) {
+        this.productId = productId;
         this.quantity = quantity;
     }
 
-    public Product getProduct() {
-        return product;
-    }
-
     public String getProductId() {
-        return product.getId();
+        return productId;
     }
 
     public int getQuantity() {
         return quantity;
     }
 
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
     @Override
     public String toString() {
-        return "Product: \n\t" + product + "\n\tWishlist Quantity: " + quantity;
+        return "Product: \n\t" + productId + "\n\tWishlist Quantity: " + quantity;
     }
 }
