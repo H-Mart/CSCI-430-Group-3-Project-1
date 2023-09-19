@@ -14,7 +14,6 @@ public class Client {
      * @postcondition id is set to nextId, nextId is incremented
      */
     public Client(String name, String address) {
-        // cast nextId to string for id and increment nextId
         this.id = Integer.toString(nextId++);
         this.name = name;
         this.address = address;
@@ -35,7 +34,7 @@ public class Client {
     /**
      * @param productId  the id of the product to add to the wishlist
      * @param quantity the quantity of the product to add
-     * @precondition product is not null, quantity is greater than 0
+     * @precondition productId is not null, quantity is greater than 0
      * @postcondition the product and quantity are added to the wishlist as a WishlistItem
      */
     public void addToWishlist(String productId, int quantity) {

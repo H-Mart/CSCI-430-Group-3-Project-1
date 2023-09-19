@@ -1,12 +1,9 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Optional;
 
 public final class UserInterface {
-    // class for user interaction with the system
-    // all methods are static and constructor is private
-    // thus no state is stored in this class
-
     private static final BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
 
     private UserInterface() {
@@ -33,7 +30,6 @@ public final class UserInterface {
         System.out.println("Please select an option:");
         while (true) {
 
-            // print menu
             System.out.println("    1. Add client");
             System.out.println("    2. Add products");
             System.out.println("    3. Add products to Client wishlist");
@@ -43,8 +39,6 @@ public final class UserInterface {
             System.out.println("    0. Exit");
             System.out.print("> ");
 
-
-            // get user input
             String input = UserInterface.getUserInput();
             switch (input) {
                 case "1":
@@ -86,7 +80,7 @@ public final class UserInterface {
         System.out.print("\nEnter client address: ");
         String address = UserInterface.getUserInput();
 
-        var addedId = Warehouse.instance().addClient(name, address);
+        String addedId = Warehouse.instance().addClient(name, address);
 
         if (Warehouse.instance().getClientById(addedId).isPresent()) {
             System.out.println("\nClient added - " + Warehouse.instance().getClientById(addedId).get());
@@ -112,7 +106,7 @@ public final class UserInterface {
         System.out.println("\nEnter product quantity: ");
         int quantity = Integer.parseInt(UserInterface.getUserInput());
 
-        var addedId = Warehouse.instance().addProduct(name, price, quantity);
+        String addedId = Warehouse.instance().addProduct(name, price, quantity);
 
         if (Warehouse.instance().getProductById(addedId).isPresent()) {
             System.out.println("\nProduct added - " + Warehouse.instance().getProductById(addedId).get());
@@ -136,6 +130,13 @@ public final class UserInterface {
         }
     }
 
+    /**
+     * Allow the user to add products to a client's wishlist
+     *
+     * @precondition none
+     * @postcondition if the client and product(s) exist,
+     * the product(s) is/are added to the client's wishlist as a WishlistItem
+     */
     public static void addProductsToClientWishlist() {
         System.out.println("Please enter your client id: ");
         String clientId = UserInterface.getUserInput();
@@ -167,25 +168,59 @@ public final class UserInterface {
         }
     }
 
+    /*
+     * Prints all clients in the ordering system in a nicely organized table
+     */
     public static void printClients() {
-        var idPadding = 4;
-        var namePadding = 12;
-        var addressPadding = 15;
         var idHeader = "ID";
         var nameHeader = "Name";
         var addressHeader = "Address";
 
-        var idColWidth = idPadding * 2 + idHeader.length();
-        var nameColWidth = namePadding * 2 + nameHeader.length();
-        var addressColWidth = addressPadding * 2 + addressHeader.length();
+        var maxIdLength = idHeader.length();
+        var maxNameLength = nameHeader.length();
+        var maxAddressLength = addressHeader.length();
+
+        var clientIterator = Warehouse.instance().getClientIterator();
+        while (clientIterator.hasNext()) {
+            var client = clientIterator.next();
+            if (client.getId().length() > maxIdLength) {
+                maxIdLength = client.getId().length();
+            }
+            if (client.getName().length() > maxNameLength) {
+                maxNameLength = client.getName().length();
+            }
+            if (client.getAddress().length() > maxAddressLength) {
+                maxAddressLength = client.getAddress().length();
+            }
+        }
+
+        // default padding for each column, to be added to the left and right side of the headers
+        var idPadding = 3;
+        var namePadding = 3;
+        var addressPadding = 3;
+
+        // adjust column width to fit the longest string in the column plus the padding
+        var idColWidth = idPadding * 2 + maxIdLength;
+        var nameColWidth = namePadding * 2 + maxNameLength;
+        var addressColWidth = addressPadding * 2 + maxAddressLength;
+
+        // using the whole column width, calculate the amount of padding needed for each header
+        var idHeaderPadding = (idColWidth - idHeader.length()) / 2;
+        var nameHeaderPadding = (nameColWidth - nameHeader.length()) / 2;
+        var addressHeaderPadding = (addressColWidth - addressHeader.length()) / 2;
+
+        // recalculate the column width to account for the header length and padding
+        idColWidth = idHeaderPadding * 2 + idHeader.length();
+        nameColWidth = nameHeaderPadding * 2 + nameHeader.length();
+        addressColWidth = addressHeaderPadding * 2 + addressHeader.length();
 
         String horizontalLine = "-".repeat(idColWidth + nameColWidth + addressColWidth + 4);
         System.out.println(horizontalLine);
 
 // @formatter:off
-        System.out.printf("|%" + idPadding       + "s" + "%s"  + "%-" + idPadding       + "s" +
-                          "|%" + namePadding     + "s" + "%s"  + "%-" + namePadding     + "s" +
-                          "|%" + addressPadding  + "s" + "%s"  + "%-" + addressPadding  + "s" + "|\n",
+        System.out.printf("|%" + idHeaderPadding       + "s" + "%s"  + "%-" +  idHeaderPadding      + "s" +
+                          "|%" + nameHeaderPadding     + "s" + "%s"  + "%-" +  nameHeaderPadding    + "s" +
+                          "|%" + addressHeaderPadding  + "s" + "%s"  + "%-" +  addressHeaderPadding + "s" + "|\n",
                 " ", idHeader, " ",
                 " ", nameHeader, " ",
                 " ", addressHeader, " ");
@@ -193,40 +228,79 @@ public final class UserInterface {
 
         System.out.println(horizontalLine);
 
-        var clientIterator = Warehouse.instance().getClientIterator();
+        clientIterator = Warehouse.instance().getClientIterator();
         while (clientIterator.hasNext()) {
             var client = clientIterator.next();
+            // subtract 1 from the column width to account for a space between the column and the border
             System.out.printf("|%" + (idColWidth - 1) + "s | %-" + (nameColWidth - 1) + "s| %-" + (addressColWidth - 1) + "s|\n",
                     client.getId(), client.getName(), client.getAddress());
         }
         System.out.println(horizontalLine);
     }
 
+    /*
+     * Prints all products in the ordering system in a nicely organized table
+     */
     public static void printProducts() {
-
-        // amount of padding for each column, on the left and right side of the text
-        var idPadding = 4;
-        var namePadding = 8;
-        var pricePadding = 8;
-        var quantityPadding = 8;
         var idHeader = "ID";
         var nameHeader = "Name";
         var priceHeader = "Price";
         var quantityHeader = "Quantity";
 
-        var idColWidth = idPadding * 2 + idHeader.length();
-        var nameColWidth = namePadding * 2 + nameHeader.length();
-        var priceColWidth = pricePadding * 2 + priceHeader.length();
-        var quantityColWidth = quantityPadding * 2 + quantityHeader.length();
+        var maxIdLength = idHeader.length();
+        var maxNameLength = nameHeader.length();
+        var maxPriceLength = priceHeader.length();
+        var maxQuantityLength = quantityHeader.length();
+
+        var productIterator = Warehouse.instance().getProductIterator();
+        while (productIterator.hasNext()) {
+            var product = productIterator.next();
+            if (product.getId().length() > maxIdLength) {
+                maxIdLength = product.getId().length();
+            }
+            if (product.getName().length() > maxNameLength) {
+                maxNameLength = product.getName().length();
+            }
+            if (Double.toString(product.getPrice()).length() > maxPriceLength) {
+                maxPriceLength = Double.toString(product.getPrice()).length();
+            }
+            if (Integer.toString(product.getQuantity()).length() > maxQuantityLength) {
+                maxQuantityLength = Integer.toString(product.getQuantity()).length();
+            }
+        }
+
+        // default padding for each column, to be added to the left and right side of the headers
+        var idPadding = 3;
+        var namePadding = 3;
+        var pricePadding = 3;
+        var quantityPadding = 3;
+
+        // adjust column width to fit the longest string in the column plus the padding
+        var idColWidth = idPadding * 2 + maxIdLength;
+        var nameColWidth = namePadding * 2 + maxNameLength;
+        var priceColWidth = pricePadding * 2 + maxPriceLength;
+        var quantityColWidth = quantityPadding * 2 + maxQuantityLength;
+
+        // using the whole column width, calculate the amount of padding needed for each header
+        var idHeaderPadding = (idColWidth - idHeader.length()) / 2;
+        var nameHeaderPadding = (nameColWidth - nameHeader.length()) / 2;
+        var priceHeaderPadding = (priceColWidth - priceHeader.length()) / 2;
+        var quantityHeaderPadding = (quantityColWidth - quantityHeader.length()) / 2;
+
+        // recalculate the column width to account for the header length and padding
+        idColWidth = idHeaderPadding * 2 + idHeader.length();
+        nameColWidth = nameHeaderPadding * 2 + nameHeader.length();
+        priceColWidth = priceHeaderPadding * 2 + priceHeader.length();
+        quantityColWidth = quantityHeaderPadding * 2 + quantityHeader.length();
 
         String horizontalLine = "-".repeat(idColWidth + nameColWidth + priceColWidth + quantityColWidth + 5);
         System.out.println(horizontalLine);
 
 // @formatter:off
-        System.out.printf("|%" + idPadding       + "s" + "%s"  + "%-" + idPadding       + "s" +
-                          "|%" + namePadding     + "s" + "%s"  + "%-" + namePadding     + "s" +
-                          "|%" + pricePadding    + "s" + "%s"  + "%-" + pricePadding    + "s" +
-                          "|%" + quantityPadding + "s" + "%s"  + "%-" + quantityPadding + "s" + "|\n",
+        System.out.printf("|%" + idHeaderPadding       + "s" + "%s"  + "%-" + idHeaderPadding       + "s" +
+                          "|%" + nameHeaderPadding     + "s" + "%s"  + "%-" + nameHeaderPadding     + "s" +
+                          "|%" + priceHeaderPadding    + "s" + "%s"  + "%-" + priceHeaderPadding    + "s" +
+                          "|%" + quantityHeaderPadding + "s" + "%s"  + "%-" + quantityHeaderPadding + "s" + "|\n",
                 " ", idHeader, " ",
                 " ", nameHeader, " ",
                 " ", priceHeader, " ",
@@ -235,11 +309,11 @@ public final class UserInterface {
 
         System.out.println(horizontalLine);
 
-        var productIterator = Warehouse.instance().getProductIterator();
+        productIterator = Warehouse.instance().getProductIterator();
         while (productIterator.hasNext()) {
             var product = productIterator.next();
             System.out.printf("|%" + (idColWidth - 1) + "s | %-" + (nameColWidth - 1) + "s|%" + (priceColWidth - 1) +
-                            "s |%" + (quantityColWidth - 1) + "s |\n",
+                            ".2f |%" + (quantityColWidth - 1) + "s |\n",
                     product.getId(), product.getName(), product.getPrice(), product.getQuantity());
         }
         System.out.println(horizontalLine);
@@ -255,8 +329,11 @@ public final class UserInterface {
         printClientWishlist(clientId);
     }
 
+    /*
+     * Prints the client's wishlist including the product id, product name, and wishlist-ed quantity
+     */
     private static void printClientWishlist(String clientId) {
-        var client = Warehouse.instance().getClientById(clientId);
+        Optional<Client> client = Warehouse.instance().getClientById(clientId);
         if (client.isEmpty()) {
             System.out.println("Client not found");
             return;
@@ -268,7 +345,7 @@ public final class UserInterface {
 
         while (clientWishlistIterator.hasNext()) {
             var wishlistItem = clientWishlistIterator.next();
-            var product = Warehouse.instance().getProductById(wishlistItem.getProductId());
+            Optional<Product> product = Warehouse.instance().getProductById(wishlistItem.getProductId());
 
             if (product.isEmpty()) {
                 System.err.println("The product with id " + wishlistItem.getProductId() + " was not found");

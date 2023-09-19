@@ -31,6 +31,7 @@ public class Warehouse {
             warehouse.addProduct("Test Product 2", 2.99, 20);
 
             warehouse.addClient("Test Client 3", "Test Address 3");
+            warehouse.addClient("Test Client 4", "Test Address 3 But it's really long so we can see what happens when it's too long");
             warehouse.addProduct("Test Product 3", 123.99, 30);
             warehouse.addProduct("Test Product 3", 123.9, 30);
         }
