@@ -1,4 +1,6 @@
-public class Client {
+import java.io.Serializable;
+
+public class Client implements Serializable {
     private final String id;
     private String name;
     private String address;

@@ -1,4 +1,6 @@
-public final class WishlistItem {
+import java.io.Serializable;
+
+public final class WishlistItem implements Serializable {
     private final String productId;
     private int quantity;
 

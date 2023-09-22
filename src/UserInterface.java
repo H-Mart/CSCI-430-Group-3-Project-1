@@ -1,9 +1,10 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.util.Optional;
 
-public final class UserInterface {
+public final class UserInterface implements Serializable {
     private static final BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
 
     private UserInterface() {
@@ -36,6 +37,8 @@ public final class UserInterface {
             System.out.println("    4. Print clients");
             System.out.println("    5. Print products");
             System.out.println("    6. Print Client wishlist");
+            System.out.println("    7. Save current state");
+            System.out.println("    8. Load stored state");
             System.out.println("    0. Exit");
             System.out.print("> ");
 
@@ -59,6 +62,12 @@ public final class UserInterface {
                 case "6":
                     printClientWishlist();
                     break;
+                case "7":
+                    saveState();
+                    break;
+                case "8":
+                    loadState();
+                    break;
                 case "0":
                     System.exit(0);
                     break;
@@ -67,6 +76,14 @@ public final class UserInterface {
                     break;
             }
         }
+    }
+
+    private static void saveState() {
+        Warehouse.serializeWarehouse();
+    }
+
+    private static void loadState() {
+        Warehouse.deserializeWarehouse();
     }
 
     /**

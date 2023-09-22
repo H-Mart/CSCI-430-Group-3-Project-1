@@ -1,7 +1,8 @@
+import java.io.*;
 import java.util.Iterator;
 import java.util.Optional;
 
-public class Warehouse {
+public class Warehouse implements Serializable {
     // singleton class for coupling the user interface to the back end
 
     private static Warehouse warehouse;
@@ -13,6 +14,25 @@ public class Warehouse {
     private Warehouse() {
         productList = new ProductList();
         clientList = new ClientList();
+    }
+
+    public static void serializeWarehouse() {
+        try (var fileOut = new FileOutputStream("warehouse.ser");
+             var objectOut = new ObjectOutputStream(fileOut)) {
+            objectOut.writeObject(warehouse);
+            fileOut.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deserializeWarehouse() {
+        try (var fileIn = new FileInputStream("warehouse.ser");
+             var objectIn = new ObjectInputStream(fileIn)) {
+            warehouse = (Warehouse) objectIn.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -31,7 +51,7 @@ public class Warehouse {
             warehouse.addProduct("Test Product 2", 2.99, 20);
 
             warehouse.addClient("Test Client 3", "Test Address 3");
-            warehouse.addClient("Test Client 4", "Test Address 3 But it's really long so we can see what happens when it's too long");
+            warehouse.addClient("Test Client 4", "Test Address 3 But it's really long so we can see what happens when it's really long");
             warehouse.addProduct("Test Product 3", 123.99, 30);
             warehouse.addProduct("Test Product 3", 123.9, 30);
         }

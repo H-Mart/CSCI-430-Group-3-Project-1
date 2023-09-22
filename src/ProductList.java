@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Optional;
 
-public class ProductList {
+public class ProductList implements Serializable {
     // singleton class for storing products
     private final ArrayList<Product> productArrayList;
 

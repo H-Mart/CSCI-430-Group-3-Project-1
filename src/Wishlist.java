@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Wishlist {
+public class Wishlist implements Serializable {
     // container class to hold wishlist items
     private final ArrayList<WishlistItem> wishlist;
 

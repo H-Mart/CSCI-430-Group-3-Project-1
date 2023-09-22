@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Optional;
 
-public class ClientList {
+public class ClientList implements Serializable {
     // singleton class for storing clients
     private final ArrayList<Client> clientArrayList;
 
@@ -39,6 +40,12 @@ public class ClientList {
         return true;
     }
 
+    /**
+     * checks if a client with the given id exists in the client list
+     * @param clientId the id of the client to remove
+     * @precondition clientId is not null
+     * @return true if the client exists, false otherwise
+     */
     public boolean clientIdInList(String clientId) {
         for (Client client : clientArrayList) {
             if (client.getId().equals(clientId)) {
