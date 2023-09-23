@@ -4,7 +4,8 @@ import java.util.Iterator;
 import java.util.Optional;
 
 public class ProductList implements Serializable {
-    // singleton class for storing products
+    public static final long serialVersionUID = 1L;
+
     private final ArrayList<Product> productArrayList;
 
     /**

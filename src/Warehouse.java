@@ -3,6 +3,7 @@ import java.util.Iterator;
 import java.util.Optional;
 
 public class Warehouse implements Serializable {
+    public static final long serialVersionUID = 1L;
     // singleton class for coupling the user interface to the back end
 
     private static Warehouse warehouse;
@@ -19,6 +20,7 @@ public class Warehouse implements Serializable {
     public static void serializeWarehouse() {
         try (var fileOut = new FileOutputStream("warehouse.ser");
              var objectOut = new ObjectOutputStream(fileOut)) {
+            objectOut.defaultWriteObject();
             objectOut.writeObject(warehouse);
             fileOut.flush();
         } catch (IOException e) {
@@ -29,7 +31,10 @@ public class Warehouse implements Serializable {
     public static void deserializeWarehouse() {
         try (var fileIn = new FileInputStream("warehouse.ser");
              var objectIn = new ObjectInputStream(fileIn)) {
-            warehouse = (Warehouse) objectIn.readObject();
+            objectIn.defaultReadObject();
+            objectIn.readObject();
+            System.out.println("Warehouse deserialized");
+            return;
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

@@ -1,6 +1,8 @@
 import java.io.Serializable;
 
 public class Client implements Serializable {
+    public static final long serialVersionUID = 1L;
+
     private final String id;
     private String name;
     private String address;

@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.Optional;
 
 public class ClientList implements Serializable {
+    public static final long serialVersionUID = 1L;
+
     // singleton class for storing clients
     private final ArrayList<Client> clientArrayList;
 
