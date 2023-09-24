@@ -1,7 +1,7 @@
 import java.io.Serializable;
 
 public final class WishlistItem implements Serializable {
-    public static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private final String productId;
     private int quantity;

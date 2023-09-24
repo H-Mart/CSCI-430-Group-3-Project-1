@@ -3,7 +3,7 @@ import java.util.Iterator;
 import java.util.Optional;
 
 public class Warehouse implements Serializable {
-    public static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     // singleton class for coupling the user interface to the back end
 
     private static Warehouse warehouse;
@@ -12,15 +12,19 @@ public class Warehouse implements Serializable {
 
     private final ClientList clientList;
 
+    private final IdServer clientIdServer;
+    private final IdServer productIdServer;
+
     private Warehouse() {
         productList = new ProductList();
         clientList = new ClientList();
+        clientIdServer = new IdServer();
+        productIdServer = new IdServer();
     }
 
     public static void serializeWarehouse() {
         try (var fileOut = new FileOutputStream("warehouse.ser");
              var objectOut = new ObjectOutputStream(fileOut)) {
-            objectOut.defaultWriteObject();
             objectOut.writeObject(warehouse);
             fileOut.flush();
         } catch (IOException e) {
@@ -31,10 +35,7 @@ public class Warehouse implements Serializable {
     public static void deserializeWarehouse() {
         try (var fileIn = new FileInputStream("warehouse.ser");
              var objectIn = new ObjectInputStream(fileIn)) {
-            objectIn.defaultReadObject();
-            objectIn.readObject();
-            System.out.println("Warehouse deserialized");
-            return;
+            warehouse = (Warehouse) objectIn.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -49,16 +50,16 @@ public class Warehouse implements Serializable {
         if (warehouse == null) {
             warehouse = new Warehouse();
             // add test clients and products
-            warehouse.addClient("Test Client", "Test Address");
-            warehouse.addProduct("Test Product", 10.99, 10);
-
-            warehouse.addClient("Test Client 2", "Test Address 2");
-            warehouse.addProduct("Test Product 2", 2.99, 20);
-
-            warehouse.addClient("Test Client 3", "Test Address 3");
-            warehouse.addClient("Test Client 4", "Test Address 3 But it's really long so we can see what happens when it's really long");
-            warehouse.addProduct("Test Product 3", 123.99, 30);
-            warehouse.addProduct("Test Product 3", 123.9, 30);
+//            warehouse.addClient("Test Client", "Test Address");
+//            warehouse.addProduct("Test Product", 10.99, 10);
+//
+//            warehouse.addClient("Test Client 2", "Test Address 2");
+//            warehouse.addProduct("Test Product 2", 2.99, 20);
+//
+//            warehouse.addClient("Test Client 3", "Test Address 3");
+//            warehouse.addClient("Test Client 4", "Test Address 3 But it's really long so we can see what happens when it's really long");
+//            warehouse.addProduct("Test Product 3", 123.99, 30);
+//            warehouse.addProduct("Test Product 3", 123.9, 30);
         }
         return warehouse;
     }
@@ -71,7 +72,7 @@ public class Warehouse implements Serializable {
      * @postcondition the client is added to the client list
      */
     public String addClient(String name, String address) {
-        Client client = new Client(name, address);
+        Client client = new Client(name, address, clientIdServer);
         clientList.insertClient(client);
         return client.getId();
     }
@@ -103,7 +104,7 @@ public class Warehouse implements Serializable {
      * @postcondition the product is added to the product list and the id is returned
      */
     public String addProduct(String name, double price, int quantity) {
-        Product product = new Product(name, price, quantity);
+        Product product = new Product(name, price, quantity, productIdServer);
         productList.insertProduct(product);
         return product.getId();
     }
@@ -116,16 +117,16 @@ public class Warehouse implements Serializable {
      * @precondition productId and clientId are not null
      * @postcondition the product is added to the client's wishlist
      */
-    public String addProductToClientWishlist(String clientId, String productId, int quantity) {
+    public void addProductToClientWishlist(String clientId, String productId, int quantity) {
         var client = clientList.getClientById(clientId);
         var product = productList.getProductById(productId);
 
         if (client.isEmpty()) {
             System.out.println("Client not found");
-            return "";
+            return;
         } else if (product.isEmpty()) {
             System.out.println("Product not found");
-            return "";
+            return;
         }
 
         var clientWishlist = client.get().getWishlist();
@@ -137,7 +138,6 @@ public class Warehouse implements Serializable {
             client.get().addToWishlist(productId, quantity);
         }
 
-        return "";
     }
 
     public Iterator<Client> getClientIterator() {

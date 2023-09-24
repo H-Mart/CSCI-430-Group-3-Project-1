@@ -83,7 +83,7 @@ public final class UserInterface implements Serializable {
     }
 
     private static void loadState() {
-        Warehouse.instance();
+//        Warehouse.instance();
         Warehouse.deserializeWarehouse();
     }
 

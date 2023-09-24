@@ -1,15 +1,13 @@
 import java.io.Serializable;
 
 public class Client implements Serializable {
-    public static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private final String id;
-    private String name;
-    private String address;
+    private final String name;
+    private final String address;
 
     private final Wishlist wishlist;
-
-    private static int nextId = 1;
 
     /**
      * @param name    the name of the client
@@ -17,8 +15,8 @@ public class Client implements Serializable {
      * @precondition name and address are not null
      * @postcondition id is set to nextId, nextId is incremented
      */
-    public Client(String name, String address) {
-        this.id = Integer.toString(nextId++);
+    public Client(String name, String address, IdServer idServer) {
+        this.id = Integer.toString(idServer.getNewId());
         this.name = name;
         this.address = address;
         this.wishlist = new Wishlist();
@@ -36,8 +34,8 @@ public class Client implements Serializable {
     }
 
     /**
-     * @param productId  the id of the product to add to the wishlist
-     * @param quantity the quantity of the product to add
+     * @param productId the id of the product to add to the wishlist
+     * @param quantity  the quantity of the product to add
      * @precondition productId is not null, quantity is greater than 0
      * @postcondition the product and quantity are added to the wishlist as a WishlistItem
      */

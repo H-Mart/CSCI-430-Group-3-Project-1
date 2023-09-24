@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Wishlist implements Serializable {
-    public static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     // container class to hold wishlist items
     private final ArrayList<WishlistItem> wishlist;

@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.Optional;
 
 public class ProductList implements Serializable {
-    public static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private final ArrayList<Product> productArrayList;
 
@@ -30,7 +30,6 @@ public class ProductList implements Serializable {
         }
         return Optional.empty();
     }
-
 
 
     public Iterator<Product> getIterator() {
