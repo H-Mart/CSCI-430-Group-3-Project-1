@@ -12,7 +12,7 @@ public class Product implements Serializable {
      * @param name     name of product
      * @param price    price of product
      * @param quantity quantity of product
-     * @postcondition id is set to nextId, nextId is incremented
+     * @postcondition  name, price, and quantity are set, id is set to nextId, nextId is incremented
      */
     public Product(String name, double price, int quantity, IdServer idServer) {
         this.id = Integer.toString(idServer.getNewId());

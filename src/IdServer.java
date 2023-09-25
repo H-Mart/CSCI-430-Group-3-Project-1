@@ -2,17 +2,29 @@ import java.io.Serializable;
 
 public class IdServer implements Serializable {
     private static final long serialVersionUID = 1L;
-    private int idCounter = 1;
+    private int nextId = 1;
 
     public IdServer() {
     }
 
+    /**
+     * Get the current next id and increment
+     * @precondition none
+     * @postcondition nextId is incremented and returned
+     * @return the next id
+     */
     public int getNewId() {
-        return idCounter++;
+        return nextId++;
     }
 
-    public int getIdCounter() {
-        return idCounter;
+    /**
+     * Get the current next id without incrementing
+     * @precondition none
+     * @postcondition nextId is returned
+     * @return the next id
+     */
+    public int getNextId() {
+        return nextId;
     }
 
     /**
@@ -20,6 +32,6 @@ public class IdServer implements Serializable {
      */
     @Override
     public String toString() {
-        return ("IdServer" + idCounter);
+        return ("IdServer" + nextId);
     }
 }

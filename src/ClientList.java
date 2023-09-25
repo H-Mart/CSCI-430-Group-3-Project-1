@@ -36,15 +36,15 @@ public class ClientList implements Serializable {
      * @param client the client to add
      * @precondition client is not null
      * @postcondition the client is added to the client list
+     * @return true since arraylist add always returns true
      */
     public boolean insertClient(Client client) {
-        clientArrayList.add(client);
-        return true;
+        return clientArrayList.add(client);
     }
 
     /**
      * checks if a client with the given id exists in the client list
-     * @param clientId the id of the client to remove
+     * @param clientId the id of the client to search for
      * @precondition clientId is not null
      * @return true if the client exists, false otherwise
      */
@@ -55,5 +55,9 @@ public class ClientList implements Serializable {
             }
         }
         return false;
+    }
+
+    public String toString() {
+        return clientArrayList.toString();
     }
 }

@@ -233,6 +233,7 @@ public final class UserInterface implements Serializable {
         addressColWidth = addressHeaderPadding * 2 + addressHeader.length();
 
         String horizontalLine = "-".repeat(idColWidth + nameColWidth + addressColWidth + 4);
+        System.out.println("Client List: ");
         System.out.println(horizontalLine);
 
 // @formatter:off
@@ -312,6 +313,7 @@ public final class UserInterface implements Serializable {
         quantityColWidth = quantityHeaderPadding * 2 + quantityHeader.length();
 
         String horizontalLine = "-".repeat(idColWidth + nameColWidth + priceColWidth + quantityColWidth + 5);
+        System.out.println("Product List: ");
         System.out.println(horizontalLine);
 
 // @formatter:off

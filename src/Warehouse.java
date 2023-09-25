@@ -3,8 +3,8 @@ import java.util.Iterator;
 import java.util.Optional;
 
 public class Warehouse implements Serializable {
-    private static final long serialVersionUID = 1L;
     // singleton class for coupling the user interface to the back end
+    private static final long serialVersionUID = 1L;
 
     private static Warehouse warehouse;
 
@@ -13,6 +13,7 @@ public class Warehouse implements Serializable {
     private final ClientList clientList;
 
     private final IdServer clientIdServer;
+
     private final IdServer productIdServer;
 
     private Warehouse() {
@@ -22,6 +23,12 @@ public class Warehouse implements Serializable {
         productIdServer = new IdServer();
     }
 
+    /**
+     * method to save the state of the warehouse
+     *
+     * @precondition none
+     * @postcondition the warehouse is serialized to the file warehouse.ser
+     */
     public static void serializeWarehouse() {
         try (var fileOut = new FileOutputStream("warehouse.ser");
              var objectOut = new ObjectOutputStream(fileOut)) {
@@ -32,6 +39,12 @@ public class Warehouse implements Serializable {
         }
     }
 
+    /**
+     * method to restore a previous state of the warehouse
+     *
+     * @precondition a file named warehouse.ser exists and contains a serialized warehouse
+     * @postcondition id servers and lists are restored to the state they were in when the warehouse was serialized
+     */
     public static void deserializeWarehouse() {
         try (var fileIn = new FileInputStream("warehouse.ser");
              var objectIn = new ObjectInputStream(fileIn)) {
@@ -42,34 +55,26 @@ public class Warehouse implements Serializable {
     }
 
     /**
-     * @return the instance of the Warehouse
+     * @return a Warehouse instance
      * @precondition none
-     * @postcondition if the instance did not exist, it is created and returned otherwise the existing instance is returned
+     * @postcondition if the instance did not exist, it is created, stored in the static variable, and returned.
+     * otherwise the existing instance is returned
      */
     public static Warehouse instance() {
         if (warehouse == null) {
             warehouse = new Warehouse();
-            // add test clients and products
-//            warehouse.addClient("Test Client", "Test Address");
-//            warehouse.addProduct("Test Product", 10.99, 10);
-//
-//            warehouse.addClient("Test Client 2", "Test Address 2");
-//            warehouse.addProduct("Test Product 2", 2.99, 20);
-//
-//            warehouse.addClient("Test Client 3", "Test Address 3");
-//            warehouse.addClient("Test Client 4", "Test Address 3 But it's really long so we can see what happens when it's really long");
-//            warehouse.addProduct("Test Product 3", 123.99, 30);
-//            warehouse.addProduct("Test Product 3", 123.9, 30);
         }
         return warehouse;
     }
 
     /**
+     * Adds a new client to the client list
+     *
      * @param name    the name of the client
      * @param address the address of the client
-     * @return the id of the client
+     * @return a String containing the id of the Client
      * @precondition name and address are not null
-     * @postcondition the client is added to the client list
+     * @postcondition the client is added to the client list, the id is returned, and the id server is updated to the next id
      */
     public String addClient(String name, String address) {
         Client client = new Client(name, address, clientIdServer);
@@ -78,44 +83,59 @@ public class Warehouse implements Serializable {
     }
 
     /**
+     * Searches the client list for a client with the given id
+     *
      * @param clientId the id of the client to fetch
-     * @return an optional containing the client if it exists otherwise an empty optional
+     * @return an Optional containing the client if it exists, otherwise an empty Optional
      * @precondition clientId is not null
+     * @postcondition an empty Optional is returned if the client does not exist, otherwise an Optional containing the client is returned
      */
     public Optional<Client> getClientById(String clientId) {
         return clientList.getClientById(clientId);
     }
 
     /**
+     * Searches the product list for a product with the given id
+     *
      * @param productId the id of the product to fetch
-     * @return an optional containing the product if it exists otherwise an empty optional
+     * @return an Optional containing the product if it exists, otherwise an empty Optional
      * @precondition productId is not null
+     * @postcondition an empty optional is returned if the product does not exist, otherwise an optional containing the product is returned
      */
     public Optional<Product> getProductById(String productId) {
         return productList.getProductById(productId);
     }
 
     /**
+     * Adds a new product to the product list
+     *
      * @param name     the name of the product
      * @param price    the price of the product
      * @param quantity the quantity of the product
-     * @return the id of the product added
-     * @precondition name and address are not null
-     * @postcondition the product is added to the product list and the id is returned
+     * @return a String containing the id of the Product
+     * @precondition name is not null, price is non-negative, and quantity is non-negative
+     * @postcondition the product is added to the product list, the id is returned, and the id server is updated to the next id
      */
     public String addProduct(String name, double price, int quantity) {
+        if (price < 0) {
+            System.out.println("Price must be non-negative");
+            throw new IllegalArgumentException();
+        } else if (quantity < 0) {
+            System.out.println("Quantity must be non-negative");
+            throw new IllegalArgumentException();
+        }
         Product product = new Product(name, price, quantity, productIdServer);
         productList.insertProduct(product);
         return product.getId();
     }
 
     /**
-     * @param productId the id of the product to add to the client's wishlist
      * @param clientId  the id of the client to add the product to
+     * @param productId the id of the product to add to the client's wishlist
      * @param quantity  the quantity of the product to add
-     * @return the id of the product added
-     * @precondition productId and clientId are not null
-     * @postcondition the product is added to the client's wishlist
+     * @precondition productId and clientId are not null and exist in their respective lists, and quantity is non-negative
+     * @postcondition the product is added to the client's wishlist, or the quantity of the product in the wishlist is updated
+     * if any of the preconditions are not met, an error message is printed and the method returns without modifying any state
      */
     public void addProductToClientWishlist(String clientId, String productId, int quantity) {
         var client = clientList.getClientById(clientId);
@@ -127,17 +147,20 @@ public class Warehouse implements Serializable {
         } else if (product.isEmpty()) {
             System.out.println("Product not found");
             return;
+        } else if (quantity < 0) {
+            System.out.println("Quantity must be non-negative");
+            return;
         }
 
         var clientWishlist = client.get().getWishlist();
-        if (clientWishlist.productInWishlist(productId)) {
+        Optional<WishlistItem> wishlistItem = clientWishlist.getWishlistItem(productId);
+        if (wishlistItem.isPresent()) {
             // if product is already in wishlist, update quantity
-            clientWishlist.getWishlistItem(productId).setQuantity(quantity);
+            wishlistItem.get().setQuantity(quantity);
         } else {
             // otherwise add product to wishlist
             client.get().addToWishlist(productId, quantity);
         }
-
     }
 
     public Iterator<Client> getClientIterator() {

@@ -18,7 +18,7 @@ public class ProductList implements Serializable {
 
     /**
      * @param productId the id of the product
-     * @return an optional containing the product if it exists otherwise an empty optional
+     * @return an Optional containing the product if it exists, otherwise an empty Optional
      * @precondition productId is not null
      * @postcondition if the product exists, an optional containing the product is returned otherwise an empty optional is returned
      */
@@ -45,6 +45,13 @@ public class ProductList implements Serializable {
         productArrayList.add(product);
     }
 
+    /**
+     * checks if a product with the given id exists in the product list
+     *
+     * @param productId the id of the product to search for
+     * @precondition productId is not null
+     * @return true if the product exists, false otherwise
+     */
     public boolean productIdInList(String productId) {
         for (Product product : productArrayList) {
             if (product.getId().equals(productId)) {

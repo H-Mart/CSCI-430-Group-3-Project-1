@@ -1,11 +1,11 @@
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Optional;
 
 public class Wishlist implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    // container class to hold wishlist items
     private final ArrayList<WishlistItem> wishlist;
 
     /**
@@ -16,8 +16,10 @@ public class Wishlist implements Serializable {
     }
 
     /**
+     * Adds a WishlistItem to the wishlist
+     *
      * @param wishlistItem wishlist item to add
-     * @postcondition adds wishlist item to wishlist
+     * @postcondition wishlist item is added to wishlist
      */
     public void addWishlistItem(WishlistItem wishlistItem) {
         wishlist.add(wishlistItem);
@@ -27,21 +29,20 @@ public class Wishlist implements Serializable {
         return wishlist.iterator();
     }
 
-    public boolean productInWishlist(String productId) {
+    /**
+     * Searches the wishlist for a WishlistItem with the given id
+     *
+     * @param productId the product id of the WishlistItem to fetch
+     * @return an Optional containing the WishlistItem if it exists, otherwise an empty Optional
+     * @precondition productId is not null
+     * @postcondition an empty optional is returned if the WishlistItem does not exist, otherwise an optional containing the WishlistItem is returned
+     */
+    public Optional<WishlistItem> getWishlistItem(String productId) {
         for (WishlistItem wishlistItem : wishlist) {
             if (wishlistItem.getProductId().equals(productId)) {
-                return true;
+                return Optional.of(wishlistItem);
             }
         }
-        return false;
-    }
-
-    public WishlistItem getWishlistItem(String productId) {
-        for (WishlistItem wishlistItem : wishlist) {
-            if (wishlistItem.getProductId().equals(productId)) {
-                return wishlistItem;
-            }
-        }
-        return null;
+        return Optional.empty();
     }
 }
