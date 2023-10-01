@@ -46,8 +46,7 @@ public class Client implements Serializable {
         if (quantity < 0) {
             throw new IllegalArgumentException("Quantity must be greater than 0");
         }
-        WishlistItem wishlistItem = new WishlistItem(productId, quantity);
-        wishlist.addWishlistItem(wishlistItem);
+        wishlist.addWishlistItem(new WishlistItem(productId, quantity));
     }
 
     public String getId() {
