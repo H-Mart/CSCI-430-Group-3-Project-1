@@ -1,12 +1,13 @@
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 public class Wishlist implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final ArrayList<WishlistItem> wishlist;
+    private final List<WishlistItem> wishlist;
 
     /**
      * @postcondition creates empty wishlist
@@ -31,6 +32,26 @@ public class Wishlist implements Serializable {
      */
     public void addWishlistItem(WishlistItem wishlistItem) {
         wishlist.add(wishlistItem);
+    }
+
+    public void removeWishlistItem(String productId) {
+        int index = -1;
+        for (var item : wishlist) {
+            index++;
+            if (item.getProductId().equals(productId)) {
+                wishlist.remove(index);
+                return;
+            }
+        }
+    }
+
+    public void updateWishlistItemQuantity(String productId, int quantity) {
+        for (var item : wishlist) {
+            if (item.getProductId().equals(productId)) {
+                item.setQuantity(quantity);
+                return;
+            }
+        }
     }
 
     public Iterator<WishlistItem> getIterator() {

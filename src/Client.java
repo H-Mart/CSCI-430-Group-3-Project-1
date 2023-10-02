@@ -1,13 +1,16 @@
 import java.io.Serializable;
 
 public class Client implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private final String id;
     private final String name;
     private final String address;
 
     private final Wishlist wishlist;
+    private final OrderList orderList;
+
+    private double balance;
 
     /**
      * @param name    the name of the client
@@ -20,6 +23,8 @@ public class Client implements Serializable {
         this.name = name;
         this.address = address;
         this.wishlist = new Wishlist();
+        this.orderList = new OrderList();
+        this.balance = 0;
     }
 
     /**
@@ -49,6 +54,26 @@ public class Client implements Serializable {
         wishlist.addWishlistItem(new WishlistItem(productId, quantity));
     }
 
+    public void addToOrderList(Order order) {
+        orderList.insertOrder(order);
+    }
+
+    public void removeFromWishlist(String productId) {
+        wishlist.removeWishlistItem(productId);
+    }
+
+    public void updateWishlistItemQuantity(String productId, int quantity) {
+        wishlist.updateWishlistItemQuantity(productId, quantity);
+    }
+
+    public void addToBalance(double amount) {
+        balance += amount;
+    }
+
+    public void subtractFromBalance(double amount) {
+        balance -= amount;
+    }
+
     public String getId() {
         return id;
     }
@@ -63,6 +88,10 @@ public class Client implements Serializable {
 
     public Wishlist getWishlist() {
         return wishlist;
+    }
+
+    public OrderList getOrderList() {
+        return orderList;
     }
 
     @Override
