@@ -34,11 +34,12 @@ public final class UserInterface implements Serializable {
             System.out.println("    1. Add client");
             System.out.println("    2. Add products");
             System.out.println("    3. Add products to Client wishlist");
-            System.out.println("    4. Print clients");
-            System.out.println("    5. Print products");
-            System.out.println("    6. Print Client wishlist");
-            System.out.println("    7. Save current state");
-            System.out.println("    8. Load stored state");
+            System.out.println("    4. Start order");
+            System.out.println("    5. Print clients");
+            System.out.println("    6. Print products");
+            System.out.println("    7. Print Client wishlist");
+            System.out.println("    8. Save current state");
+            System.out.println("    9. Load stored state");
             System.out.println("    0. Exit");
             System.out.print("> ");
 
@@ -54,18 +55,21 @@ public final class UserInterface implements Serializable {
                     addProductsToClientWishlist();
                     break;
                 case "4":
-                    printClients();
+                    startOrder();
                     break;
                 case "5":
-                    printProducts();
+                    printClients();
                     break;
                 case "6":
-                    printClientWishlist();
+                    printProducts();
                     break;
                 case "7":
-                    saveState();
+                    printClientWishlist();
                     break;
                 case "8":
+                    saveState();
+                    break;
+                case "9":
                     loadState();
                     break;
                 case "0":
@@ -376,6 +380,98 @@ public final class UserInterface implements Serializable {
                     + product.get().getName() + "\n\tWishlist Quantity: " + wishlistItem.getQuantity());
             System.out.println();
         }
+    }
+
+    private static void startOrder() {
+        System.out.println("Please enter the client id: ");
+        String clientId = UserInterface.getUserInput();
+        if (Warehouse.instance().getClientById(clientId).isEmpty()) {
+            System.out.println("Client not found");
+            return;
+        }
+
+        var client = Warehouse.instance().getClientById(clientId).get();
+        var order = new Order(clientId);
+        orderWishlist(client, order);
+        orderAdditionalItems(order);
+        order.completeOrder(client);
+    }
+
+    private static void orderWishlist(Client client, Order currentOrder) {
+        System.out.println("Processing wishlist: ");
+        printClientWishlist(client.getId());
+        var clientWishlistCopy = new Wishlist(client.getWishlist());
+        var clientWishlistIterator = clientWishlistCopy.getIterator();
+
+        while (clientWishlistIterator.hasNext()) {
+            var wishlistItem = clientWishlistIterator.next();
+            Optional<Product> product = Warehouse.instance().getProductById(wishlistItem.getProductId());
+            if (product.isEmpty()) {
+                System.err.println("The product with id " + wishlistItem.getProductId() + " was not found");
+                return;
+            }
+
+            System.out.println("Item: \n" + product.get().getName() + " Quantity Wishlisted: " + wishlistItem.getQuantity() +
+                    "\nQuantity Available: " + product.get().getQuantity() + "\nPrice: " + product.get().getPrice());
+
+            System.out.println("Options: ");
+            System.out.println("1. Remove from wishlist");
+            System.out.println("2. Add amount in wishlist to order");
+            System.out.println("3. Add different amount to order");
+            System.out.println("4. Skip");
+            System.out.println("> ");
+
+            String input = UserInterface.getUserInput();
+            switch (input) {
+                case "1": // remove from wishlist
+                    Warehouse.instance().removeFromWishlist(client.getId(), wishlistItem.getProductId());
+                    break;
+                case "2": // add amount in wishlist to order
+                    Warehouse.instance().addProductToOrder(currentOrder, product.get(), wishlistItem.getQuantity());
+                    Warehouse.instance().removeFromWishlist(client.getId(), wishlistItem.getProductId());
+                    break;
+                case "3": // add different amount to order
+                    System.out.println("Please enter the amount to add to the order: ");
+                    int quantity = Integer.parseInt(UserInterface.getUserInput());
+                    Warehouse.instance().addProductToOrder(currentOrder, product.get(), quantity);
+
+                    if (quantity >= wishlistItem.getQuantity()) {
+                        Warehouse.instance().removeFromWishlist(client.getId(), wishlistItem.getProductId());
+                    } else {
+                        client.updateWishlistItemQuantity(wishlistItem.getProductId(), wishlistItem.getQuantity() - quantity);
+                    }
+                    break;
+                case "4": // skip
+                    break;
+                default:
+                    System.out.println("Invalid input");
+                    break;
+            }
+        }
+    }
+
+    private static void orderAdditionalItems(Order currentOrder) {
+        while (true) {
+            System.out.println("Would you like to add additional items to the order? (y/n)");
+            String input = UserInterface.getUserInput();
+            if (input.equalsIgnoreCase("n")) {
+                return;
+            }
+            System.out.println("Please enter the product id: ");
+            String productId = UserInterface.getUserInput();
+            var product = Warehouse.instance().getProductById(productId);
+            if (product.isEmpty()) {
+                System.out.println("Product not found");
+                return;
+            }
+            System.out.println("Product: " + product.get().getName() + "\nQuantity Available: " + product.get().getQuantity() +
+                    "\nPrice: " + product.get().getPrice());
+
+            System.out.println("Please enter the quantity to add to the order: ");
+            int quantity = Integer.parseInt(UserInterface.getUserInput());
+            Warehouse.instance().addProductToOrder(currentOrder, product.get(), quantity);
+        }
+
     }
 
     // prints a message saying the option is not implemented, for use in stubs
