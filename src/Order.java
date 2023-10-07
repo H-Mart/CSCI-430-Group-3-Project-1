@@ -18,30 +18,31 @@ public class Order implements Serializable {
     public String getClientId() {
         return clientId;
     }
+    // TODO order has to be added
+//    public void addToOrder(Product product, int orderQuantity) {
+//        if (orderQuantity <= product.getQuantity()) {
+//            invoice.insertInvoiceItem(new InvoiceItem(product.getId(), orderQuantity, product.getPrice()));
+//            product.setQuantity(product.getQuantity() - orderQuantity);
+//        } else {
+//            System.out.println("Order quantity exceeds product quantity.");
+//            System.out.println("Adding " + (orderQuantity - product.getQuantity()) + " to product waitlist.");
+//            invoice.insertInvoiceItem(new InvoiceItem(product.getId(), product.getQuantity(), product.getPrice()));
+//            product.addToWaitlist(clientId, orderQuantity - product.getQuantity());
+//            product.setQuantity(0);
+//        }
+//    }
 
-    public void addToOrder(Product product, int orderQuantity) {
-        if (orderQuantity <= product.getQuantity()) {
-            invoice.insertInvoiceItem(new InvoiceItem(product.getId(), orderQuantity, product.getPrice()));
-            product.setQuantity(product.getQuantity() - orderQuantity);
-        } else {
-            System.out.println("Order quantity exceeds product quantity.");
-            System.out.println("Adding " + (orderQuantity - product.getQuantity()) + " to product waitlist.");
-            invoice.insertInvoiceItem(new InvoiceItem(product.getId(), product.getQuantity(), product.getPrice()));
-            product.addToWaitlist(clientId, orderQuantity - product.getQuantity());
-            product.setQuantity(0);
-        }
-    }
+//    public void completeOrder(Client client) {
+//        double totalCost = 0;
+//        var invoiceItemIterator = invoice.getInvoiceItemIterator();
+//        while (invoiceItemIterator.hasNext()) {
+//            var invoiceItem = invoiceItemIterator.next();
+//            totalCost += invoiceItem.getTotalPrice();
+//        }
+//        this.transactionRecord = new TransactionRecord("Order for " + clientId, totalCost);
+//        this.orderComplete = true;
+//        client.subtractFromBalance(totalCost);
+//        client.addToOrderList(this);
+//    }
 
-    public void completeOrder(Client client) {
-        double totalCost = 0;
-        var invoiceItemIterator = invoice.getInvoiceItemIterator();
-        while (invoiceItemIterator.hasNext()) {
-            var invoiceItem = invoiceItemIterator.next();
-            totalCost += invoiceItem.getTotalPrice();
-        }
-        this.transactionRecord = new TransactionRecord("Order for " + clientId, totalCost);
-        this.orderComplete = true;
-        client.subtractFromBalance(totalCost);
-        client.addToOrderList(this);
-    }
 }

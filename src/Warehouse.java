@@ -174,9 +174,29 @@ public class Warehouse implements Serializable {
         client.get().removeFromWishlist(productId);
     }
 
-    public void addProductToOrder(Order order, Product product, int quantity){
-        order.addToOrder(product, quantity);
+    public InvoiceItem orderItem(String clientId, String productId, int orderQuantity) {
+        // todo finish this
+        var client = clientList.getClientById(clientId).orElseThrow();
+        var product = productList.getProductById(productId).orElseThrow();
+
+        InvoiceItem invoiceItem;
+        if (orderQuantity <= product.getQuantity()) {
+            invoiceItem = new InvoiceItem(product.getId(), orderQuantity, product.getPrice());
+            product.setQuantity(product.getQuantity() - orderQuantity);
+        } else {
+            System.out.println("Order quantity exceeds product quantity.");
+            System.out.println("Adding " + (orderQuantity - product.getQuantity()) + " to product waitlist.");
+            invoiceItem = new InvoiceItem(product.getId(), product.getQuantity(), product.getPrice());
+            product.addToWaitlist(clientId, orderQuantity - product.getQuantity());
+            product.setQuantity(0);
+        }
+
+        return invoiceItem;
     }
+
+//    public void addProductToOrder(Order order, Product product, int quantity){
+//        order.addToOrder(product, quantity);
+//    }
 
     public Iterator<Client> getClientIterator() {
         return clientList.getIterator();
