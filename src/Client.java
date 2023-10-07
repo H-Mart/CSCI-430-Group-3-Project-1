@@ -8,7 +8,7 @@ public class Client implements Serializable {
     private final String address;
 
     private final Wishlist wishlist;
-    private final OrderList orderList;
+    private final TransactionList transactionList;
 
     private double balance;
 
@@ -23,7 +23,7 @@ public class Client implements Serializable {
         this.name = name;
         this.address = address;
         this.wishlist = new Wishlist();
-        this.orderList = new OrderList();
+        this.transactionList = new TransactionList();
         this.balance = 0;
     }
 
@@ -54,8 +54,8 @@ public class Client implements Serializable {
         wishlist.addWishlistItem(new WishlistItem(productId, quantity));
     }
 
-    public void addToOrderList(Order order) {
-        orderList.insertOrder(order);
+    public void addToTransactionList(TransactionRecord transactionRecord) {
+        transactionList.insertTransaction(transactionRecord);
     }
 
     public void removeFromWishlist(String productId) {
@@ -88,10 +88,6 @@ public class Client implements Serializable {
 
     public Wishlist getWishlist() {
         return wishlist;
-    }
-
-    public OrderList getOrderList() {
-        return orderList;
     }
 
     @Override

@@ -399,7 +399,7 @@ public final class UserInterface implements Serializable {
 //        order.completeOrder(client);
     }
 
-    private static void orderWishlist(Client client, Order currentOrder) {
+//    private static void orderWishlist(Client client, Order currentOrder) {
 //        System.out.println("Processing wishlist: ");
 //        printClientWishlist(client.getId());
 //        var clientWishlistCopy = new Wishlist(client.getWishlist());
@@ -450,9 +450,9 @@ public final class UserInterface implements Serializable {
 //                    break;
 //            }
 //        }
-    }
+//    }
 
-    private static void orderAdditionalItems(Order currentOrder) {
+//    private static void orderAdditionalItems(Order currentOrder) {
 //        while (true) {
 //            System.out.println("Would you like to add additional items to the order? (y/n)");
 //            String input = UserInterface.getUserInput();
@@ -474,7 +474,7 @@ public final class UserInterface implements Serializable {
 //            Warehouse.instance().addProductToOrder(currentOrder, product.get(), quantity);
 //        }
 
-    }
+//    }
 
     // prints a message saying the option is not implemented, for use in stubs
     public static void optionNotImplemented() {
