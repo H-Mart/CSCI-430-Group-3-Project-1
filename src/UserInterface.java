@@ -30,9 +30,9 @@ public final class UserInterface implements Serializable {
     public static void main(String[] args) {
         // print welcome message
         System.out.println("Welcome to the ordering system!");
-        System.out.println("Please select an option:");
         while (true) {
-
+            System.out.println();
+            System.out.println("Main Menu: ");
             System.out.println("    1.  Add client");
             System.out.println("    2.  Add products");
             System.out.println("    3.  Add products to Client wishlist");
@@ -47,8 +47,9 @@ public final class UserInterface implements Serializable {
             System.out.println("    12. Load stored state");
             System.out.println("    0. Exit");
             System.out.print("> ");
-
             String input = UserInterface.getUserInput();
+            System.out.println();
+
             switch (input) {
                 case "1":
                     addClient();
@@ -101,7 +102,6 @@ public final class UserInterface implements Serializable {
     }
 
     private static void loadState() {
-//        Warehouse.instance();
         Warehouse.deserializeWarehouse();
     }
 
@@ -158,7 +158,7 @@ public final class UserInterface implements Serializable {
     public static void addProducts() {
         while (true) {
             addProduct();
-            System.out.println("Add another product? (y/n)");
+            System.out.print("\nAdd another product? (y/n): ");
             String input = UserInterface.getUserInput();
             if (input.equalsIgnoreCase("n")) {
                 break;
@@ -174,29 +174,29 @@ public final class UserInterface implements Serializable {
      * the product(s) is/are added to the client's wishlist as a WishlistItem
      */
     public static void addProductsToClientWishlist() {
-        System.out.println("Please enter your client id: ");
+        System.out.print("Please enter your client id: ");
         String clientId = UserInterface.getUserInput();
         if (Warehouse.instance().getClientById(clientId).isEmpty()) {
-            System.out.println("Client not found");
+            System.out.println("\nClient not found");
             return;
         }
 
         while (true) {
-            System.out.println("Please enter the product id: ");
+            System.out.print("\nPlease enter the product id: ");
             String productId = UserInterface.getUserInput();
             if (Warehouse.instance().getProductById(productId).isEmpty()) {
                 System.out.println("Product not found");
                 return;
             }
 
-            System.out.println("Please enter the quantity: ");
+            System.out.print("\nPlease enter the quantity: ");
             int quantity = Integer.parseInt(UserInterface.getUserInput());
 
             Warehouse.instance().addProductToClientWishlist(clientId, productId, quantity);
 
             printClientWishlist(clientId);
 
-            System.out.println("\nAdd another product? (y/n)");
+            System.out.print("\nAdd another product? (y/n): ");
             String input = UserInterface.getUserInput();
             if (input.equalsIgnoreCase("n")) {
                 break;
@@ -391,7 +391,11 @@ public final class UserInterface implements Serializable {
 
         var clientWishlistIterator = client.get().getWishlist().getIterator();
 
-        System.out.println("Current Wishlist: ");
+        if (!clientWishlistIterator.hasNext()) {
+            return;
+        }
+
+        System.out.println("\nCurrent Wishlist: ");
 
         while (clientWishlistIterator.hasNext()) {
             var wishlistItem = clientWishlistIterator.next();
@@ -421,6 +425,11 @@ public final class UserInterface implements Serializable {
         System.out.println("Waitlist for " + product.get().getName() + ": ");
 
         var waitlistIterator = product.get().getWaitlist().getIterator();
+
+        if (!waitlistIterator.hasNext()) {
+            System.out.println("\nWaitlist is empty");
+            return;
+        }
         while (waitlistIterator.hasNext()) {
             var waitlistItem = waitlistIterator.next();
             System.out.println("\tWaitlisted by: " + waitlistItem.getClientId());
@@ -442,8 +451,12 @@ public final class UserInterface implements Serializable {
         }
 
         var clientTransactionIterator = client.get().getTransactionList().getIterator();
+        if (!clientTransactionIterator.hasNext()) {
+            System.out.println("\nOrder history is empty");
+            return;
+        }
 
-        System.out.println("Order History: ");
+        System.out.println("\nOrder History: ");
 
         while (clientTransactionIterator.hasNext()) {
             var transactionRecord = clientTransactionIterator.next();
@@ -452,6 +465,7 @@ public final class UserInterface implements Serializable {
             System.out.println("\tTotal Price: " + transactionRecord.getTotalCost());
             System.out.println();
             var invoiceIterator = transactionRecord.getInvoice().getIterator();
+            System.out.println("\tInvoice: ");
             while (invoiceIterator.hasNext()) {
                 var invoiceItem = invoiceIterator.next();
                 System.out.println("\t\tProduct ID: " + invoiceItem.getProductId());
@@ -472,14 +486,12 @@ public final class UserInterface implements Serializable {
             return;
         }
 
-        System.out.println("Balance: " + client.get().getBalance());
+        System.out.printf("Balance: %.2f", client.get().getBalance());
     }
 
 
     private static void startOrder() {
-        // TODO Should not change anything until client accepts order at the end
-        // TODO Update to use new prelimOrder
-        System.out.println("Please enter the client id: ");
+        System.out.print("Please enter the client id: ");
         String clientId = UserInterface.getUserInput();
         if (Warehouse.instance().getClientById(clientId).isEmpty()) {
             System.out.println("Client not found");
@@ -489,17 +501,24 @@ public final class UserInterface implements Serializable {
         var client = Warehouse.instance().getClientById(clientId).get();
         var prelimOrder = new PrelimOrder(clientId);
         List<OrderItemInfo> orderInfo = orderWishlist(client, prelimOrder);
-        System.out.println("The order is displayed below: ");
+
+        if (orderInfo.isEmpty()) {
+            System.out.println("Wishlist is empty, exiting order");
+            return;
+        }
+
+        System.out.println("The order is displayed below: \n");
         double totalPrice = 0;
+        int itemNumber = 1;
         for (var orderItem : orderInfo) {
             var productOrdered = Warehouse.instance().getProductById(orderItem.getProductId()).orElseThrow();
-            System.out.println("Product Name: " + productOrdered.getName() + ", Quantity: " + orderItem.getQuantity() +
-                    ", Price: " + orderItem.getPrice());
+            System.out.printf("%d - Product Name: %s, Quantity: %d, Price: %.2f\n", itemNumber++, productOrdered.getName(), orderItem.getQuantity(),
+                    orderItem.getPrice());
             totalPrice += orderItem.getPrice() * orderItem.getQuantity();
         }
-        System.out.println("Total Price: " + totalPrice);
+        System.out.printf("Total Price: %.2f\n", totalPrice);
 
-        System.out.println("Would you like to complete the order? (y/n)");
+        System.out.print("Would you like to complete the order? (y/n): ");
         String input = UserInterface.getUserInput();
         if (input.equalsIgnoreCase("n")) {
             return;
@@ -511,9 +530,15 @@ public final class UserInterface implements Serializable {
     }
 
     private static ArrayList<OrderItemInfo> orderWishlist(Client client, PrelimOrder currentPrelimOrder) {
-        System.out.println("Processing wishlist: ");
+        // TODO make this less ugly before final implementation
+        System.out.println("Ordering Products from Wishlist: ");
         var clientWishlistCopy = new Wishlist(client.getWishlist());
         var clientWishlistIterator = clientWishlistCopy.getIterator();
+
+        if (!clientWishlistIterator.hasNext()) {
+            System.out.println("\nWishlist is empty");
+            return new ArrayList<>();
+        }
 
         ArrayList<OrderItemInfo> orderItemInfoList = new ArrayList<>();
         while (clientWishlistIterator.hasNext()) {
@@ -523,15 +548,17 @@ public final class UserInterface implements Serializable {
                 System.err.println("The product with id " + wishlistItem.getProductId() + " was not found");
                 return orderItemInfoList;
             }
+            System.out.printf("\n\tItem: %s\n\tQuantity Wishlisted: %d\n\tQuantity Available: %d\n\tPrice: %.2f\n",
+                    product.get().getName(),
+                    wishlistItem.getQuantity(),
+                    product.get().getQuantity(),
+                    product.get().getPrice());
 
-            System.out.println("Item: \n" + product.get().getName() + " Quantity Wishlisted: " + wishlistItem.getQuantity() +
-                    "\nQuantity Available: " + product.get().getQuantity() + "\nPrice: " + product.get().getPrice());
-
-            System.out.println("Options: ");
-            System.out.println("1. Remove from wishlist");
-            System.out.println("2. Add amount in wishlist to order");
-            System.out.println("3. Add different amount to order");
-            System.out.println("4. Skip");
+            System.out.println("\nOptions: ");
+            System.out.println("    1. Remove from wishlist");
+            System.out.println("    2. Add amount in wishlist to order");
+            System.out.println("    3. Add different amount to order");
+            System.out.println("    4. Skip");
             System.out.print("> ");
 
             String input = UserInterface.getUserInput();
@@ -551,7 +578,7 @@ public final class UserInterface implements Serializable {
                     }
                     break;
                 case "3": // add different amount to order
-                    System.out.println("Please enter the amount to add to the order: ");
+                    System.out.print("\nPlease enter the amount to add to the order: ");
                     int quantity = Integer.parseInt(UserInterface.getUserInput());
                     currentPrelimOrder.addOrderAction(wishlistItem.getProductId(), quantity);
 
