@@ -2,6 +2,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public final class UserInterface implements Serializable {
@@ -385,72 +387,107 @@ public final class UserInterface implements Serializable {
     private static void startOrder() {
         // TODO Should not change anything until client accepts order at the end
         // TODO Update to use new prelimOrder
-//        System.out.println("Please enter the client id: ");
-//        String clientId = UserInterface.getUserInput();
-//        if (Warehouse.instance().getClientById(clientId).isEmpty()) {
-//            System.out.println("Client not found");
-//            return;
-//        }
-//
-//        var client = Warehouse.instance().getClientById(clientId).get();
-//        var order = new Order(clientId);
-//        orderWishlist(client, order);
+        System.out.println("Please enter the client id: ");
+        String clientId = UserInterface.getUserInput();
+        if (Warehouse.instance().getClientById(clientId).isEmpty()) {
+            System.out.println("Client not found");
+            return;
+        }
+
+        var client = Warehouse.instance().getClientById(clientId).get();
+        var prelimOrder = new PrelimOrder(clientId);
+        List<OrderItemInfo> orderInfo = orderWishlist(client, prelimOrder);
 //        orderAdditionalItems(order);
-//        order.completeOrder(client);
+        System.out.println("The order is displayed below: ");
+        double totalPrice = 0;
+        for (var orderItem : orderInfo) {
+            var productOrdered = Warehouse.instance().getProductById(orderItem.getProductId()).orElseThrow();
+            System.out.println("Product Name: " + productOrdered.getName() + ", Quantity: " + orderItem.getQuantity() +
+                    ", Price: " + orderItem.getPrice());
+            totalPrice += orderItem.getPrice() * orderItem.getQuantity();
+        }
+        System.out.println("Total Price: " + totalPrice);
+
+        System.out.println("Would you like to complete the order? (y/n)");
+        String input = UserInterface.getUserInput();
+        if (input.equalsIgnoreCase("n")) {
+            return;
+        }
+
+        System.out.println("Please enter a description for the order: ");
+        String description = UserInterface.getUserInput();
+        prelimOrder.finalizeOrder(description);
     }
 
-//    private static void orderWishlist(Client client, Order currentOrder) {
-//        System.out.println("Processing wishlist: ");
+    private static ArrayList<OrderItemInfo> orderWishlist(Client client, PrelimOrder currentPrelimOrder) {
+        System.out.println("Processing wishlist: ");
 //        printClientWishlist(client.getId());
-//        var clientWishlistCopy = new Wishlist(client.getWishlist());
-//        var clientWishlistIterator = clientWishlistCopy.getIterator();
-//
-//        while (clientWishlistIterator.hasNext()) {
-//            var wishlistItem = clientWishlistIterator.next();
-//            Optional<Product> product = Warehouse.instance().getProductById(wishlistItem.getProductId());
-//            if (product.isEmpty()) {
-//                System.err.println("The product with id " + wishlistItem.getProductId() + " was not found");
-//                return;
-//            }
-//
-//            System.out.println("Item: \n" + product.get().getName() + " Quantity Wishlisted: " + wishlistItem.getQuantity() +
-//                    "\nQuantity Available: " + product.get().getQuantity() + "\nPrice: " + product.get().getPrice());
-//
-//            System.out.println("Options: ");
-//            System.out.println("1. Remove from wishlist");
-//            System.out.println("2. Add amount in wishlist to order");
-//            System.out.println("3. Add different amount to order");
-//            System.out.println("4. Skip");
-//            System.out.println("> ");
-//
-//            String input = UserInterface.getUserInput();
-//            switch (input) {
-//                case "1": // remove from wishlist
-//                    Warehouse.instance().removeFromWishlist(client.getId(), wishlistItem.getProductId());
-//                    break;
-//                case "2": // add amount in wishlist to order
-//                    Warehouse.instance().addProductToOrder(currentOrder, product.get(), wishlistItem.getQuantity());
-//                    Warehouse.instance().removeFromWishlist(client.getId(), wishlistItem.getProductId());
-//                    break;
-//                case "3": // add different amount to order
-//                    System.out.println("Please enter the amount to add to the order: ");
-//                    int quantity = Integer.parseInt(UserInterface.getUserInput());
-//                    Warehouse.instance().addProductToOrder(currentOrder, product.get(), quantity);
-//
-//                    if (quantity >= wishlistItem.getQuantity()) {
-//                        Warehouse.instance().removeFromWishlist(client.getId(), wishlistItem.getProductId());
-//                    } else {
-//                        client.updateWishlistItemQuantity(wishlistItem.getProductId(), wishlistItem.getQuantity() - quantity);
-//                    }
-//                    break;
-//                case "4": // skip
-//                    break;
-//                default:
-//                    System.out.println("Invalid input");
-//                    break;
-//            }
-//        }
-//    }
+        var clientWishlistCopy = new Wishlist(client.getWishlist());
+        var clientWishlistIterator = clientWishlistCopy.getIterator();
+
+        ArrayList<OrderItemInfo> orderItemInfoList = new ArrayList<>();
+        while (clientWishlistIterator.hasNext()) {
+            var wishlistItem = clientWishlistIterator.next();
+            Optional<Product> product = Warehouse.instance().getProductById(wishlistItem.getProductId());
+            if (product.isEmpty()) {
+                System.err.println("The product with id " + wishlistItem.getProductId() + " was not found");
+                return orderItemInfoList;
+            }
+
+            System.out.println("Item: \n" + product.get().getName() + " Quantity Wishlisted: " + wishlistItem.getQuantity() +
+                    "\nQuantity Available: " + product.get().getQuantity() + "\nPrice: " + product.get().getPrice());
+
+            System.out.println("Options: ");
+            System.out.println("1. Remove from wishlist");
+            System.out.println("2. Add amount in wishlist to order");
+            System.out.println("3. Add different amount to order");
+            System.out.println("4. Skip");
+            System.out.println("> ");
+
+            String input = UserInterface.getUserInput();
+            switch (input) {
+                case "1": // remove from wishlist
+                    currentPrelimOrder.addRemoveWishlistAction(wishlistItem.getProductId());
+                    break;
+                case "2": // add amount in wishlist to order
+                    // storing information about the order item so that it can be printed later
+                    orderItemInfoList.add(getOrderItemInfo(product.get(), wishlistItem.getQuantity()));
+                    currentPrelimOrder.addOrderAction(wishlistItem.getProductId(), wishlistItem.getQuantity());
+                    currentPrelimOrder.addRemoveWishlistAction(wishlistItem.getProductId());
+                    break;
+                case "3": // add different amount to order
+                    System.out.println("Please enter the amount to add to the order: ");
+                    int quantity = Integer.parseInt(UserInterface.getUserInput());
+                    currentPrelimOrder.addOrderAction(wishlistItem.getProductId(), quantity);
+
+                    // storing information about the order item so that it can be printed later
+                    orderItemInfoList.add(getOrderItemInfo(product.get(), quantity));
+                    if (quantity >= wishlistItem.getQuantity()) {
+                        currentPrelimOrder.addRemoveWishlistAction(wishlistItem.getProductId());
+                    } else {
+                        currentPrelimOrder.addUpdateWishlistAction(wishlistItem.getProductId(),
+                                wishlistItem.getQuantity() - quantity);
+                    }
+                    break;
+                case "4": // skip
+                    break;
+                default:
+                    System.out.println("Invalid input");
+                    break;
+            }
+        }
+        return orderItemInfoList;
+    }
+
+    private static OrderItemInfo getOrderItemInfo(Product product, int orderQuantity) {
+        OrderItemInfo orderItemInfo;
+        if (orderQuantity <= product.getQuantity()) {
+            orderItemInfo = new OrderItemInfo(product.getId(), orderQuantity, product.getPrice());
+        } else {
+            orderItemInfo = new OrderItemInfo(product.getId(), product.getQuantity(), product.getPrice());
+        }
+        return orderItemInfo;
+    }
 
 //    private static void orderAdditionalItems(Order currentOrder) {
 //        while (true) {

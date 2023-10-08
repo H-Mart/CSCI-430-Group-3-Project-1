@@ -174,29 +174,26 @@ public class Warehouse implements Serializable {
         client.get().removeFromWishlist(productId);
     }
 
-    public InvoiceItem orderItem(String clientId, String productId, int orderQuantity) {
-        // todo finish this
+    public OrderItemInfo orderItem(String clientId, String productId, int orderQuantity) {
         var client = clientList.getClientById(clientId).orElseThrow();
         var product = productList.getProductById(productId).orElseThrow();
 
-        InvoiceItem invoiceItem;
+        OrderItemInfo orderItemInfo;
         if (orderQuantity <= product.getQuantity()) {
-            invoiceItem = new InvoiceItem(product.getId(), orderQuantity, product.getPrice());
+            orderItemInfo = new OrderItemInfo(product.getId(), orderQuantity, product.getPrice());
+            client.subtractFromBalance(orderItemInfo.getTotalPrice());
             product.setQuantity(product.getQuantity() - orderQuantity);
         } else {
             System.out.println("Order quantity exceeds product quantity.");
             System.out.println("Adding " + (orderQuantity - product.getQuantity()) + " to product waitlist.");
-            invoiceItem = new InvoiceItem(product.getId(), product.getQuantity(), product.getPrice());
+            orderItemInfo = new OrderItemInfo(product.getId(), product.getQuantity(), product.getPrice());
+            client.subtractFromBalance(orderItemInfo.getTotalPrice());
             product.addToWaitlist(clientId, orderQuantity - product.getQuantity());
             product.setQuantity(0);
         }
 
-        return invoiceItem;
+        return orderItemInfo;
     }
-
-//    public void addProductToOrder(Order order, Product product, int quantity){
-//        order.addToOrder(product, quantity);
-//    }
 
     public Iterator<Client> getClientIterator() {
         return clientList.getIterator();

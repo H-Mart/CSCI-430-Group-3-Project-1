@@ -90,6 +90,10 @@ public class Client implements Serializable {
         return wishlist;
     }
 
+    public double getBalance() {
+        return balance;
+    }
+
     @Override
     public String toString() {
         return "id: " + id + " Name: " + name + " Address: " + address;

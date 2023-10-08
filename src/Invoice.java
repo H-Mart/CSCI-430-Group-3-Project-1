@@ -5,18 +5,26 @@ import java.util.List;
 
 public class Invoice implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final List<InvoiceItem> invoiceItemList;
+    private final List<OrderItemInfo> orderItemInfoList;
 
     public Invoice() {
-        invoiceItemList = new ArrayList<>();
+        orderItemInfoList = new ArrayList<>();
     }
 
-    public Iterator<InvoiceItem> getInvoiceItemIterator() {
-        return invoiceItemList.iterator();
+    public Iterator<OrderItemInfo> getInvoiceItemIterator() {
+        return orderItemInfoList.iterator();
     }
 
-    public boolean insertInvoiceItem(InvoiceItem invoiceItem) {
-        return invoiceItemList.add(invoiceItem);
+    public boolean insertInvoiceItem(OrderItemInfo orderItemInfo) {
+        return orderItemInfoList.add(orderItemInfo);
+    }
+
+    public double getTotalCost() {
+        double totalCost = 0;
+        for (OrderItemInfo orderItemInfo : orderItemInfoList) {
+            totalCost += orderItemInfo.getTotalPrice();
+        }
+        return totalCost;
     }
 }
 

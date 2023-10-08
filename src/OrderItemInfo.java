@@ -1,12 +1,12 @@
 import java.io.Serializable;
 
-public class InvoiceItem implements Serializable {
+public class OrderItemInfo implements Serializable {
     private static final long serialVersionUID = 1L;
     private final String productId;
     private final int quantity;
     private final double price;
 
-    public InvoiceItem(String productId, int quantity, double price) {
+    public OrderItemInfo(String productId, int quantity, double price) {
         this.productId = productId;
         this.quantity = quantity;
         this.price = price;

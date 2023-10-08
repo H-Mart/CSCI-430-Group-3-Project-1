@@ -3,63 +3,92 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PrelimOrder implements Serializable {
-    public static final long serialVersionUID = 1L;
-
-    private interface Action extends Serializable {
-        public void execute();
-    }
+    // todo maybe separate the command pattern stuff from the order stuff
+    private static final long serialVersionUID = 1L;
 
     private class OrderAction implements Serializable, Action {
-        private Warehouse warehouse;
+        private static final long serialVersionUID = 1L;
         private final String productId;
         private final int quantity;
 
-        public OrderAction(Warehouse warehouse, String productId, int quantity) {
-            this.warehouse = warehouse;
+        public OrderAction(String productId, int quantity) {
             this.productId = productId;
             this.quantity = quantity;
         }
 
         @Override
         public void execute() {
-            InvoiceItem invoiceItem = warehouse.orderItem(PrelimOrder.this.clientId, this.productId, this.quantity);
-            PrelimOrder.this.orderInvoice.insertInvoiceItem(invoiceItem);
+            OrderItemInfo orderItemInfo = warehouse.orderItem(PrelimOrder.this.client.getId(), this.productId, this.quantity);
+            orderInvoice.insertInvoiceItem(orderItemInfo);
         }
     }
 
     private class RemoveWishlistAction implements Serializable, Action {
-        private Warehouse warehouse;
+        private static final long serialVersionUID = 1L;
+        private final String productId;
 
-        private String productId;
-
-        public RemoveWishlistAction(Warehouse warehouse, String productId) {
-            this.warehouse = warehouse;
+        public RemoveWishlistAction(String productId) {
             this.productId = productId;
         }
 
         @Override
         public void execute() {
-            warehouse.removeFromWishlist(PrelimOrder.this.clientId, this.productId);
+            client.removeFromWishlist(this.productId);
         }
     }
 
-    private String clientId;
+    private class UpdateWishlistAction implements Serializable, Action {
+        private static final long serialVersionUID = 1L;
+        private final String productId;
 
-    private List<Action> actions;
+        private final int quantity;
 
-    public Invoice orderInvoice;
+        public UpdateWishlistAction(String productId, int quantity) {
+            this.productId = productId;
+            this.quantity = quantity;
+        }
+
+        @Override
+        public void execute() {
+            client.updateWishlistItemQuantity(this.productId, this.quantity);
+        }
+    }
+
+    private final Warehouse warehouse;
+
+    private final Client client;
+
+    private final List<Action> actions;
+
+    public final Invoice orderInvoice;
 
     public PrelimOrder(String clientId) {
-        this.clientId = clientId;
+        this.warehouse = Warehouse.instance();
+        this.client = warehouse.getClientById(clientId).orElseThrow();
         this.actions = new ArrayList<>();
         this.orderInvoice = new Invoice();
     }
 
     public void addOrderAction(String productId, int quantity) {
-        actions.add(new OrderAction(Warehouse.instance(), productId, quantity));
+        actions.add(new OrderAction(productId, quantity));
     }
 
     public void addRemoveWishlistAction(String productId) {
-        actions.add(new RemoveWishlistAction(Warehouse.instance(), productId));
+        actions.add(new RemoveWishlistAction(productId));
+    }
+
+    public void addUpdateWishlistAction(String productId, int quantity) {
+        actions.add(new UpdateWishlistAction(productId, quantity));
+    }
+
+    public void executeAll() {
+        for (Action action : actions) {
+            action.execute();
+        }
+    }
+
+    public void finalizeOrder(String description) {
+        executeAll();
+        client.addToTransactionList(new TransactionRecord(description, orderInvoice.getTotalCost(), orderInvoice));
     }
 }
