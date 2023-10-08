@@ -45,19 +45,4 @@ public class ProductList implements Serializable {
         productArrayList.add(product);
     }
 
-    /**
-     * checks if a product with the given id exists in the product list
-     *
-     * @param productId the id of the product to search for
-     * @precondition productId is not null
-     * @return true if the product exists, false otherwise
-     */
-    public boolean productIdInList(String productId) {
-        for (Product product : productArrayList) {
-            if (product.getId().equals(productId)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

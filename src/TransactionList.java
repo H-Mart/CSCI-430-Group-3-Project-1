@@ -4,17 +4,17 @@ import java.util.Iterator;
 import java.util.List;
 
 public class TransactionList implements Serializable {
-    private List<TransactionRecord> transactionList;
+    private final List<TransactionRecord> transactionList;
 
     public TransactionList() {
         transactionList = new ArrayList<>();
     }
 
-    public boolean insertTransaction(TransactionRecord transaction) {
-        return transactionList.add(transaction);
+    public void insertTransaction(TransactionRecord transaction) {
+        transactionList.add(transaction);
     }
 
-    public Iterator<TransactionRecord> getTransactionList() {
+    public Iterator<TransactionRecord> getIterator() {
         return transactionList.iterator();
     }
 }

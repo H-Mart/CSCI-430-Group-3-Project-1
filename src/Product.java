@@ -5,7 +5,7 @@ public class Product implements Serializable {
 
     private final String id;
     private final String name;
-    private double price;
+    private final double price;
     private int quantity;
     private final Waitlist waitlist;
 
@@ -41,22 +41,20 @@ public class Product implements Serializable {
         return quantity;
     }
 
-    // private attribute setters
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
-    public boolean addToWaitlist(String clientId, int quantity) {
-        return waitlist.addWaitlistItem(new WaitlistItem(clientId, quantity));
+    public void addToWaitlist(String clientId, int quantity) {
+        waitlist.addWaitlistItem(new WaitlistItem(clientId, quantity));
+    }
+
+    public Waitlist getWaitlist() {
+        return waitlist;
     }
 
     @Override
     public String toString() {
-        return "ID: " + id + " Price: " + price + " Quantity: " + quantity + " Name: " + name;
+        return "ID: " + id + ", Price: " + price + ", Quantity: " + quantity + ", Name: " + name;
     }
 }

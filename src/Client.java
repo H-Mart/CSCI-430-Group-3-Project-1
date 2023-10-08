@@ -28,18 +28,6 @@ public class Client implements Serializable {
     }
 
     /**
-     * Method for adding a WishlistItem to the wishlist from a Product
-     *
-     * @param product  the product to get the id from to add to the wishlist
-     * @param quantity the quantity of the product to add
-     * @precondition product is not null, quantity is greater than 0
-     * @postcondition the product and quantity are added to the wishlist as a WishlistItem
-     */
-    public void addToWishlist(Product product, int quantity) {
-        addToWishlist(product.getId(), quantity);
-    }
-
-    /**
      * Method for adding a WishlistItem to the wishlist from a Product id
      *
      * @param productId the id of the product to add to the wishlist
@@ -66,10 +54,6 @@ public class Client implements Serializable {
         wishlist.updateWishlistItemQuantity(productId, quantity);
     }
 
-    public void addToBalance(double amount) {
-        balance += amount;
-    }
-
     public void subtractFromBalance(double amount) {
         balance -= amount;
     }
@@ -90,12 +74,16 @@ public class Client implements Serializable {
         return wishlist;
     }
 
+    public TransactionList getTransactionList() {
+        return transactionList;
+    }
+
     public double getBalance() {
         return balance;
     }
 
     @Override
     public String toString() {
-        return "id: " + id + " Name: " + name + " Address: " + address;
+        return "ID: " + id + ", Name: " + name + ", Address: " + address;
     }
 }

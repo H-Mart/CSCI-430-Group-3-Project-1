@@ -11,12 +11,12 @@ public class Invoice implements Serializable {
         orderItemInfoList = new ArrayList<>();
     }
 
-    public Iterator<OrderItemInfo> getInvoiceItemIterator() {
+    public Iterator<OrderItemInfo> getIterator() {
         return orderItemInfoList.iterator();
     }
 
-    public boolean insertInvoiceItem(OrderItemInfo orderItemInfo) {
-        return orderItemInfoList.add(orderItemInfo);
+    public void insertInvoiceItem(OrderItemInfo orderItemInfo) {
+        orderItemInfoList.add(orderItemInfo);
     }
 
     public double getTotalCost() {

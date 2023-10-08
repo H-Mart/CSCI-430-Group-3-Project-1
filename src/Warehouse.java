@@ -163,17 +163,6 @@ public class Warehouse implements Serializable {
         }
     }
 
-    public void removeFromWishlist(String clientId, String productId) {
-        var client = clientList.getClientById(clientId);
-
-        if (client.isEmpty()) {
-            System.out.println("Client not found");
-            return;
-        }
-
-        client.get().removeFromWishlist(productId);
-    }
-
     public OrderItemInfo orderItem(String clientId, String productId, int orderQuantity) {
         var client = clientList.getClientById(clientId).orElseThrow();
         var product = productList.getProductById(productId).orElseThrow();
@@ -184,8 +173,6 @@ public class Warehouse implements Serializable {
             client.subtractFromBalance(orderItemInfo.getTotalPrice());
             product.setQuantity(product.getQuantity() - orderQuantity);
         } else {
-            System.out.println("Order quantity exceeds product quantity.");
-            System.out.println("Adding " + (orderQuantity - product.getQuantity()) + " to product waitlist.");
             orderItemInfo = new OrderItemInfo(product.getId(), product.getQuantity(), product.getPrice());
             client.subtractFromBalance(orderItemInfo.getTotalPrice());
             product.addToWaitlist(clientId, orderQuantity - product.getQuantity());
@@ -201,13 +188,5 @@ public class Warehouse implements Serializable {
 
     public Iterator<Product> getProductIterator() {
         return productList.getIterator();
-    }
-
-    public boolean clientExists(String clientId) {
-        return clientList.getClientById(clientId).isPresent();
-    }
-
-    public boolean productExists(String productId) {
-        return productList.getProductById(productId).isPresent();
     }
 }

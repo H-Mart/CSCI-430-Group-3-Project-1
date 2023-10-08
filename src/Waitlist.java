@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Waitlist implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -9,8 +10,12 @@ public class Waitlist implements Serializable {
         waitlist = new ArrayList<>();
     }
 
-    public boolean addWaitlistItem(WaitlistItem item) {
-        return waitlist.add(item);
+    public void addWaitlistItem(WaitlistItem item) {
+        waitlist.add(item);
+    }
+
+    public Iterator<WaitlistItem> getIterator() {
+        return waitlist.iterator();
     }
 
 

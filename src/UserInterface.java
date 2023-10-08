@@ -33,15 +33,18 @@ public final class UserInterface implements Serializable {
         System.out.println("Please select an option:");
         while (true) {
 
-            System.out.println("    1. Add client");
-            System.out.println("    2. Add products");
-            System.out.println("    3. Add products to Client wishlist");
-            System.out.println("    4. Start order");
-            System.out.println("    5. Print clients");
-            System.out.println("    6. Print products");
-            System.out.println("    7. Print Client wishlist");
-            System.out.println("    8. Save current state");
-            System.out.println("    9. Load stored state");
+            System.out.println("    1.  Add client");
+            System.out.println("    2.  Add products");
+            System.out.println("    3.  Add products to Client wishlist");
+            System.out.println("    4.  Start order");
+            System.out.println("    5.  Print clients");
+            System.out.println("    6.  Print products");
+            System.out.println("    7.  Print Client wishlist");
+            System.out.println("    8.  Print Product waitlist");
+            System.out.println("    9.  Print Client Order History");
+            System.out.println("    10. Print Client Balance");
+            System.out.println("    11. Save current state");
+            System.out.println("    12. Load stored state");
             System.out.println("    0. Exit");
             System.out.print("> ");
 
@@ -69,9 +72,18 @@ public final class UserInterface implements Serializable {
                     printClientWishlist();
                     break;
                 case "8":
-                    saveState();
+                    printWaitlist();
                     break;
                 case "9":
+                    printClientOrderHistory();
+                    break;
+                case "10":
+                    printClientBalance();
+                    break;
+                case "11":
+                    saveState();
+                    break;
+                case "12":
                     loadState();
                     break;
                 case "0":
@@ -127,7 +139,7 @@ public final class UserInterface implements Serializable {
         System.out.print("\nEnter product price: ");
         double price = Double.parseDouble(UserInterface.getUserInput());
 
-        System.out.println("\nEnter product quantity: ");
+        System.out.print("\nEnter product quantity: ");
         int quantity = Integer.parseInt(UserInterface.getUserInput());
 
         String addedId = Warehouse.instance().addProduct(name, price, quantity);
@@ -199,10 +211,12 @@ public final class UserInterface implements Serializable {
         var idHeader = "ID";
         var nameHeader = "Name";
         var addressHeader = "Address";
+        var balanceHeader = "Balance";
 
         var maxIdLength = idHeader.length();
         var maxNameLength = nameHeader.length();
         var maxAddressLength = addressHeader.length();
+        var maxBalanceLength = balanceHeader.length();
 
         var clientIterator = Warehouse.instance().getClientIterator();
         while (clientIterator.hasNext()) {
@@ -216,39 +230,48 @@ public final class UserInterface implements Serializable {
             if (client.getAddress().length() > maxAddressLength) {
                 maxAddressLength = client.getAddress().length();
             }
+            if (Double.toString(client.getBalance()).length() > maxBalanceLength) {
+                maxBalanceLength = Double.toString(client.getBalance()).length();
+            }
         }
 
         // default padding for each column, to be added to the left and right side of the headers
         var idPadding = 3;
         var namePadding = 3;
         var addressPadding = 3;
+        var balancePadding = 3;
 
         // adjust column width to fit the longest string in the column plus the padding
         var idColWidth = idPadding * 2 + maxIdLength;
         var nameColWidth = namePadding * 2 + maxNameLength;
         var addressColWidth = addressPadding * 2 + maxAddressLength;
+        var balanceColWidth = balancePadding * 2 + maxBalanceLength;
 
         // using the whole column width, calculate the amount of padding needed for each header
         var idHeaderPadding = (idColWidth - idHeader.length()) / 2;
         var nameHeaderPadding = (nameColWidth - nameHeader.length()) / 2;
         var addressHeaderPadding = (addressColWidth - addressHeader.length()) / 2;
+        var balanceHeaderPadding = (balanceColWidth - balanceHeader.length()) / 2;
 
         // recalculate the column width to account for the header length and padding
         idColWidth = idHeaderPadding * 2 + idHeader.length();
         nameColWidth = nameHeaderPadding * 2 + nameHeader.length();
         addressColWidth = addressHeaderPadding * 2 + addressHeader.length();
+        balanceColWidth = balanceHeaderPadding * 2 + balanceHeader.length();
 
-        String horizontalLine = "-".repeat(idColWidth + nameColWidth + addressColWidth + 4);
+        String horizontalLine = "-".repeat(idColWidth + nameColWidth + addressColWidth + balanceColWidth + 5);
         System.out.println("Client List: ");
         System.out.println(horizontalLine);
 
 // @formatter:off
         System.out.printf("|%" + idHeaderPadding       + "s" + "%s"  + "%-" +  idHeaderPadding      + "s" +
                           "|%" + nameHeaderPadding     + "s" + "%s"  + "%-" +  nameHeaderPadding    + "s" +
-                          "|%" + addressHeaderPadding  + "s" + "%s"  + "%-" +  addressHeaderPadding + "s" + "|\n",
+                          "|%" + addressHeaderPadding  + "s" + "%s"  + "%-" +  addressHeaderPadding + "s" +
+                          "|%" + balanceHeaderPadding  + "s" + "%s"  + "%-" +  balanceHeaderPadding + "s" + "|\n",
                 " ", idHeader, " ",
                 " ", nameHeader, " ",
-                " ", addressHeader, " ");
+                " ", addressHeader, " ",
+                " ", balanceHeader, " ");
 // @formatter:on
 
         System.out.println(horizontalLine);
@@ -257,8 +280,9 @@ public final class UserInterface implements Serializable {
         while (clientIterator.hasNext()) {
             var client = clientIterator.next();
             // subtract 1 from the column width to account for a space between the column and the border
-            System.out.printf("|%" + (idColWidth - 1) + "s | %-" + (nameColWidth - 1) + "s| %-" + (addressColWidth - 1) + "s|\n",
-                    client.getId(), client.getName(), client.getAddress());
+            System.out.printf("|%" + (idColWidth - 1) + "s | %-" +
+                            (nameColWidth - 1) + "s| %-" + (addressColWidth - 1) + "s| %" + (balanceColWidth - 1) + ".2f|\n",
+                    client.getId(), client.getName(), client.getAddress(), client.getBalance());
         }
         System.out.println(horizontalLine);
     }
@@ -384,6 +408,74 @@ public final class UserInterface implements Serializable {
         }
     }
 
+    private static void printWaitlist() {
+        System.out.print("Enter product id: ");
+        String productId = UserInterface.getUserInput();
+
+        Optional<Product> product = Warehouse.instance().getProductById(productId);
+
+        if (product.isEmpty()) {
+            System.out.println("Product not found");
+            return;
+        }
+        System.out.println("Waitlist for " + product.get().getName() + ": ");
+
+        var waitlistIterator = product.get().getWaitlist().getIterator();
+        while (waitlistIterator.hasNext()) {
+            var waitlistItem = waitlistIterator.next();
+            System.out.println("\tWaitlisted by: " + waitlistItem.getClientId());
+            System.out.println("\tDate: " + waitlistItem.getDate());
+            System.out.println("\tQuantity: " + waitlistItem.getQuantity());
+            System.out.println();
+        }
+
+    }
+
+    private static void printClientOrderHistory() {
+        System.out.print("Enter client id: ");
+        String clientId = UserInterface.getUserInput();
+
+        Optional<Client> client = Warehouse.instance().getClientById(clientId);
+        if (client.isEmpty()) {
+            System.out.println("Client not found");
+            return;
+        }
+
+        var clientTransactionIterator = client.get().getTransactionList().getIterator();
+
+        System.out.println("Order History: ");
+
+        while (clientTransactionIterator.hasNext()) {
+            var transactionRecord = clientTransactionIterator.next();
+            System.out.println("\tDate: " + transactionRecord.getDate());
+            System.out.println("\tDescription: " + transactionRecord.getDescription());
+            System.out.println("\tTotal Price: " + transactionRecord.getTotalCost());
+            System.out.println();
+            var invoiceIterator = transactionRecord.getInvoice().getIterator();
+            while (invoiceIterator.hasNext()) {
+                var invoiceItem = invoiceIterator.next();
+                System.out.println("\t\tProduct ID: " + invoiceItem.getProductId());
+                System.out.println("\t\tQuantity: " + invoiceItem.getQuantity());
+                System.out.println("\t\tPrice: " + invoiceItem.getPrice());
+                System.out.println();
+            }
+        }
+    }
+
+    private static void printClientBalance() {
+        System.out.print("Enter client id: ");
+        String clientId = UserInterface.getUserInput();
+
+        Optional<Client> client = Warehouse.instance().getClientById(clientId);
+        if (client.isEmpty()) {
+            System.out.println("Client not found");
+            return;
+        }
+
+        System.out.println("Balance: " + client.get().getBalance());
+    }
+
+
     private static void startOrder() {
         // TODO Should not change anything until client accepts order at the end
         // TODO Update to use new prelimOrder
@@ -397,7 +489,6 @@ public final class UserInterface implements Serializable {
         var client = Warehouse.instance().getClientById(clientId).get();
         var prelimOrder = new PrelimOrder(clientId);
         List<OrderItemInfo> orderInfo = orderWishlist(client, prelimOrder);
-//        orderAdditionalItems(order);
         System.out.println("The order is displayed below: ");
         double totalPrice = 0;
         for (var orderItem : orderInfo) {
@@ -421,7 +512,6 @@ public final class UserInterface implements Serializable {
 
     private static ArrayList<OrderItemInfo> orderWishlist(Client client, PrelimOrder currentPrelimOrder) {
         System.out.println("Processing wishlist: ");
-//        printClientWishlist(client.getId());
         var clientWishlistCopy = new Wishlist(client.getWishlist());
         var clientWishlistIterator = clientWishlistCopy.getIterator();
 
@@ -442,7 +532,7 @@ public final class UserInterface implements Serializable {
             System.out.println("2. Add amount in wishlist to order");
             System.out.println("3. Add different amount to order");
             System.out.println("4. Skip");
-            System.out.println("> ");
+            System.out.print("> ");
 
             String input = UserInterface.getUserInput();
             switch (input) {
@@ -454,11 +544,21 @@ public final class UserInterface implements Serializable {
                     orderItemInfoList.add(getOrderItemInfo(product.get(), wishlistItem.getQuantity()));
                     currentPrelimOrder.addOrderAction(wishlistItem.getProductId(), wishlistItem.getQuantity());
                     currentPrelimOrder.addRemoveWishlistAction(wishlistItem.getProductId());
+
+                    if (product.get().getQuantity() < wishlistItem.getQuantity()) {
+                        System.out.println("Order quantity exceeds product quantity. " +
+                                (wishlistItem.getQuantity() - product.get().getQuantity()) + " will be added to product waitlist.");
+                    }
                     break;
                 case "3": // add different amount to order
                     System.out.println("Please enter the amount to add to the order: ");
                     int quantity = Integer.parseInt(UserInterface.getUserInput());
                     currentPrelimOrder.addOrderAction(wishlistItem.getProductId(), quantity);
+
+                    if (product.get().getQuantity() < quantity) {
+                        System.out.println("Order quantity exceeds product quantity. " +
+                                (quantity - product.get().getQuantity()) + " will be added to product waitlist.");
+                    }
 
                     // storing information about the order item so that it can be printed later
                     orderItemInfoList.add(getOrderItemInfo(product.get(), quantity));
@@ -488,30 +588,6 @@ public final class UserInterface implements Serializable {
         }
         return orderItemInfo;
     }
-
-//    private static void orderAdditionalItems(Order currentOrder) {
-//        while (true) {
-//            System.out.println("Would you like to add additional items to the order? (y/n)");
-//            String input = UserInterface.getUserInput();
-//            if (input.equalsIgnoreCase("n")) {
-//                return;
-//            }
-//            System.out.println("Please enter the product id: ");
-//            String productId = UserInterface.getUserInput();
-//            var product = Warehouse.instance().getProductById(productId);
-//            if (product.isEmpty()) {
-//                System.out.println("Product not found");
-//                return;
-//            }
-//            System.out.println("Product: " + product.get().getName() + "\nQuantity Available: " + product.get().getQuantity() +
-//                    "\nPrice: " + product.get().getPrice());
-//
-//            System.out.println("Please enter the quantity to add to the order: ");
-//            int quantity = Integer.parseInt(UserInterface.getUserInput());
-//            Warehouse.instance().addProductToOrder(currentOrder, product.get(), quantity);
-//        }
-
-//    }
 
     // prints a message saying the option is not implemented, for use in stubs
     public static void optionNotImplemented() {

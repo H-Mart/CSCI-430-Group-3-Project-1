@@ -4,7 +4,7 @@ import java.util.Date;
 public class WaitlistItem implements Serializable {
     private static final long serialVersionUID = 1L;
     private final String clientId;
-    private int quantity;
+    private final int quantity;
     private final Date date;
 
     public WaitlistItem(String clientId, int quantity) {
@@ -21,16 +21,8 @@ public class WaitlistItem implements Serializable {
         return quantity;
     }
 
-    public void setQuantity(int newQuantity) {
-        quantity = newQuantity;
-    }
-
     public Date getDate() {
         return date;
-    }
-
-    public boolean lessThan(WaitlistItem item) {
-        return this.date.before(item.getDate());
     }
 
     public String toString() {
