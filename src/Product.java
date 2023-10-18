@@ -1,13 +1,15 @@
 import java.io.Serializable;
+import java.util.Optional;
 
 public class Product implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 3L;
 
     private final String id;
     private final String name;
     private final double price;
     private int quantity;
     private final Waitlist waitlist;
+    private final IdServer waitlistIdServer;
 
     /**
      * @param name     name of product
@@ -21,6 +23,7 @@ public class Product implements Serializable {
         this.price = price;
         this.quantity = quantity;
         this.waitlist = new Waitlist();
+        this.waitlistIdServer = new IdServer();
     }
 
     // private attribute getters
@@ -46,7 +49,11 @@ public class Product implements Serializable {
     }
 
     public void addToWaitlist(String clientId, int quantity) {
-        waitlist.addWaitlistItem(new WaitlistItem(clientId, quantity));
+        waitlist.addWaitlistItem(new WaitlistItem(clientId, quantity, waitlistIdServer));
+    }
+
+    public Optional<WaitlistItem> getWaitlistItem(int waitlistItemId) {
+        return waitlist.getWaitlistItem(waitlistItemId);
     }
 
     public Waitlist getWaitlist() {

@@ -11,11 +11,11 @@ public class TransactionRecord implements Serializable {
 
     private final Invoice invoice;
 
-    public TransactionRecord(String description, double totalCost, Invoice invoice) {
+    public TransactionRecord(String description, Invoice invoice) {
         this.invoice = invoice;
         this.date = new Date();
         this.description = description;
-        this.totalCost = totalCost;
+        this.totalCost = invoice.getTotalCost();
     }
 
     public Date getDate() {

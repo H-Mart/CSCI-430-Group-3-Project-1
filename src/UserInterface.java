@@ -37,14 +37,15 @@ public final class UserInterface implements Serializable {
             System.out.println("    2.  Add products");
             System.out.println("    3.  Add products to Client wishlist");
             System.out.println("    4.  Start order");
-            System.out.println("    5.  Print clients");
-            System.out.println("    6.  Print products");
-            System.out.println("    7.  Print Client wishlist");
-            System.out.println("    8.  Print Product waitlist");
-            System.out.println("    9.  Print Client Order History");
-            System.out.println("    10. Print Client Balance");
-            System.out.println("    11. Save current state");
-            System.out.println("    12. Load stored state");
+            System.out.println("    5.  Accept Shipment");
+            System.out.println("    6.  Print clients");
+            System.out.println("    7.  Print products");
+            System.out.println("    8.  Print Client wishlist");
+            System.out.println("    9.  Print Product waitlist");
+            System.out.println("    10. Print Client Order History");
+            System.out.println("    11. Print Client Balance");
+            System.out.println("    12. Save current state");
+            System.out.println("    13. Load stored state");
             System.out.println("    0. Exit");
             System.out.print("> ");
             String input = UserInterface.getUserInput();
@@ -64,27 +65,30 @@ public final class UserInterface implements Serializable {
                     startOrder();
                     break;
                 case "5":
-                    printClients();
+                    acceptShipment();
                     break;
                 case "6":
-                    printProducts();
+                    printClients();
                     break;
                 case "7":
-                    printClientWishlist();
+                    printProducts();
                     break;
                 case "8":
-                    printWaitlist();
+                    printClientWishlist();
                     break;
                 case "9":
-                    printClientOrderHistory();
+                    printWaitlist();
                     break;
                 case "10":
-                    printClientBalance();
+                    printClientOrderHistory();
                     break;
                 case "11":
-                    saveState();
+                    printClientBalance();
                     break;
                 case "12":
+                    saveState();
+                    break;
+                case "13":
                     loadState();
                     break;
                 case "0":
@@ -531,6 +535,7 @@ public final class UserInterface implements Serializable {
 
     private static ArrayList<OrderItemInfo> orderWishlist(Client client, PrelimOrder currentPrelimOrder) {
         // TODO make this less ugly before final implementation
+        // todo when order is empty, still creates a transaction record
         System.out.println("Ordering Products from Wishlist: ");
         var clientWishlistCopy = new Wishlist(client.getWishlist());
         var clientWishlistIterator = clientWishlistCopy.getIterator();
@@ -616,8 +621,59 @@ public final class UserInterface implements Serializable {
         return orderItemInfo;
     }
 
+    private static void acceptShipment() {
+        System.out.print("Please enter the product id for the shipment: ");
+        String productId = UserInterface.getUserInput();
+        Product shipmentProduct = Warehouse.instance().getProductById(productId).orElseThrow();
+
+        System.out.print("\nPlease enter the quantity: ");
+        int shipmentQuantity = Integer.parseInt(UserInterface.getUserInput());
+        if (shipmentQuantity < 0) {
+            System.out.println("\nQuantity must be non-negative");
+            return;
+        }
+
+        shipmentProduct.setQuantity(shipmentProduct.getQuantity() + shipmentQuantity);
+
+        System.out.printf("\nUpdated product quantity from %d to %d\n\n",
+                shipmentProduct.getQuantity() - shipmentQuantity, shipmentProduct.getQuantity());
+
+        var waitlistCopyIterator = new Waitlist(shipmentProduct.getWaitlist()).getIterator();
+        while (waitlistCopyIterator.hasNext()) {
+            var waitlistItem = waitlistCopyIterator.next();
+            System.out.println("Processing waitlist item: ");
+            System.out.printf("\tClient ID: %s\n\tQuantity: %d\n", waitlistItem.getClientId(), waitlistItem.getQuantity());
+            System.out.println("\tDate: " + waitlistItem.getDate());
+
+
+            System.out.println("Options:");
+            System.out.println("    1. Order Waitlisted Amount");
+            System.out.println("    2. Order Different Amount");
+            System.out.println("    3. Skip");
+            String input = UserInterface.getUserInput();
+
+            switch (input) {
+                case "1": // order waitlisted amount
+                    Warehouse.instance().fillWaitlistOrder(waitlistItem.getWaitlistItemId(), productId, waitlistItem.getQuantity());
+                    break;
+                case "2": // order different amount
+                    System.out.print("\nPlease enter the amount to order: ");
+                    int orderQuantity = Integer.parseInt(UserInterface.getUserInput());
+                    Warehouse.instance().fillWaitlistOrder(waitlistItem.getWaitlistItemId(), productId, orderQuantity);
+                    break;
+                case "3": // skip
+                    break;
+                default:
+                    System.out.println("Invalid input");
+                    break;
+            }
+        }
+    }
+
     // prints a message saying the option is not implemented, for use in stubs
     public static void optionNotImplemented() {
         System.out.println("Option not implemented");
     }
 }
+
+// todo when adding to wishlist, if item already on wishlist, give option to either update quantity or add to quantity

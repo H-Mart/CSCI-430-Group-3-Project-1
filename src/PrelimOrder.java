@@ -89,6 +89,6 @@ public class PrelimOrder implements Serializable {
 
     public void finalizeOrder(String description) {
         executeAll();
-        client.addToTransactionList(new TransactionRecord(description, orderInvoice.getTotalCost(), orderInvoice));
+        client.addToTransactionList(new TransactionRecord(description, orderInvoice));
     }
 }
