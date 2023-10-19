@@ -129,9 +129,6 @@ public final class UserInterface implements Serializable {
         }
     }
 
-    // asks user to add a product
-    // then passes the information to the ordering system
-
     /**
      * @precondition none
      * @postcondition a new product is added to the ordering system and printed if successful
@@ -534,8 +531,6 @@ public final class UserInterface implements Serializable {
     }
 
     private static ArrayList<OrderItemInfo> orderWishlist(Client client, PrelimOrder currentPrelimOrder) {
-        // TODO make this less ugly before final implementation
-        // todo when order is empty, still creates a transaction record
         System.out.println("Ordering Products from Wishlist: ");
         var clientWishlistCopy = new Wishlist(client.getWishlist());
         var clientWishlistIterator = clientWishlistCopy.getIterator();
@@ -585,6 +580,13 @@ public final class UserInterface implements Serializable {
                 case "3": // add different amount to order
                     System.out.print("\nPlease enter the amount to add to the order: ");
                     int quantity = Integer.parseInt(UserInterface.getUserInput());
+
+                    while (quantity <= 0) {
+                        System.out.println("Quantity must be positive");
+                        System.out.print("\nPlease enter the amount to add to the order: ");
+                        quantity = Integer.parseInt(UserInterface.getUserInput());
+                    }
+
                     currentPrelimOrder.addOrderAction(wishlistItem.getProductId(), quantity);
 
                     if (product.get().getQuantity() < quantity) {
@@ -675,5 +677,3 @@ public final class UserInterface implements Serializable {
         System.out.println("Option not implemented");
     }
 }
-
-// todo when adding to wishlist, if item already on wishlist, give option to either update quantity or add to quantity

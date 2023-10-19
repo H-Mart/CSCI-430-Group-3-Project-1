@@ -1,3 +1,4 @@
+
 public class ProductListTest {
 
     private static void printList(ProductList pl) {
@@ -20,15 +21,15 @@ public class ProductListTest {
         System.out.println("Printing ProductList with one product: ");
         productList.insertProduct(product);
         printList(productList);
-        System.out.println("Expected:\nID: 1 Price: 1.99 Quantity: 10 Name: Test Product");
+        System.out.println("Expected:\nID: 1, Price: 1.99, Quantity: 10, Name: Test Product");
         System.out.println();
 
         System.out.println("Printing ProductList with two products: ");
         productList.insertProduct(product2);
         printList(productList);
         System.out.println("Expected:");
-        System.out.println("ID: 1 Price: 1.99 Quantity: 10 Name: Test Product");
-        System.out.println("ID: 2 Price: 2.99 Quantity: 20 Name: Test Product 2");
+        System.out.println("ID: 1, Price: 1.99, Quantity: 10, Name: Test Product");
+        System.out.println("ID: 2, Price: 2.99, Quantity: 20, Name: Test Product 2");
         System.out.println("---------- End ProductList Test ----------");
     }
 }

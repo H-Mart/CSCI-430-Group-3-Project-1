@@ -1,3 +1,5 @@
+//import tests.*;
+
 public class FullTester {
     public static void main(String[] args) {
         IdServerTest.runTest();

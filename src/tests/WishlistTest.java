@@ -1,3 +1,4 @@
+
 public class WishlistTest {
 
     private static void printList(Wishlist wl) {

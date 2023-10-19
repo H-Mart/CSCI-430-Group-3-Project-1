@@ -3,8 +3,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PrelimOrder implements Serializable {
-    // todo maybe separate the command pattern stuff from the order stuff
     private static final long serialVersionUID = 1L;
+
+    interface Action extends Serializable {
+        long serialVersionUID = 1L;
+
+        void execute();
+    }
 
     private class OrderAction implements Serializable, Action {
         private static final long serialVersionUID = 1L;

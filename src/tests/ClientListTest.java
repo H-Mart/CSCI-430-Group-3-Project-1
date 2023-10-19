@@ -1,3 +1,4 @@
+
 public class ClientListTest {
 
     private static void printList(ClientList cll) {
@@ -21,15 +22,15 @@ public class ClientListTest {
         System.out.println("Printing ClientList with one client: ");
         clientList.insertClient(client);
         printList(clientList);
-        System.out.println("Expected:\nid: 1 Name: Test Client Address: Test Address");
+        System.out.println("Expected:\nID: 1, Name: Test Client, Address: Test Address");
         System.out.println();
 
         System.out.println("Printing ClientList with two clients: ");
         clientList.insertClient(client2);
         printList(clientList);
         System.out.println("Expected:");
-        System.out.println("id: 1 Name: Test Client Address: Test Address");
-        System.out.println("id: 2 Name: Test Client 2 Address: Test Address 2");
+        System.out.println("ID: 1, Name: Test Client, Address: Test Address");
+        System.out.println("ID: 2, Name: Test Client 2, Address: Test Address 2");
         System.out.println("---------- End ClientList Test ----------");
     }
 }

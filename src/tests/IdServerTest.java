@@ -1,3 +1,4 @@
+
 public class IdServerTest {
     public static void runTest() {
         System.out.println("---------- Begin IdServer Test ----------");

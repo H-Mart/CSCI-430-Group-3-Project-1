@@ -1,3 +1,4 @@
+
 import java.util.Iterator;
 
 public class WarehouseTest {
@@ -43,14 +44,14 @@ public class WarehouseTest {
         System.out.println("Printing Client List with one item: ");
         printClientList(Warehouse.instance().getClientIterator());
         System.out.println("Expected:");
-        System.out.println("id: 1 Name: Test Client Address: Test Address");
+        System.out.println("ID: 1, Name: Test Client, Address: Test Address");
 
         System.out.println();
 
         System.out.println("Printing Product List with one item: ");
         printProductList(Warehouse.instance().getProductIterator());
         System.out.println("Expected:");
-        System.out.println("ID: 1 Price: 10.99 Quantity: 10 Name: Test Product");
+        System.out.println("ID: 1, Price: 10.99, Quantity: 10, Name: Test Product");
 
         System.out.println();
 
@@ -61,16 +62,16 @@ public class WarehouseTest {
         System.out.println("Printing Client List with two items: ");
         printClientList(Warehouse.instance().getClientIterator());
         System.out.println("Expected:");
-        System.out.println("id: 1 Name: Test Client Address: Test Address");
-        System.out.println("id: 2 Name: Test Client 2 Address: Test Address 2");
+        System.out.println("ID: 1, Name: Test Client, Address: Test Address");
+        System.out.println("ID: 2, Name: Test Client 2, Address: Test Address 2");
 
         System.out.println();
 
         System.out.println("Printing Product List with two items: ");
         printProductList(Warehouse.instance().getProductIterator());
         System.out.println("Expected:");
-        System.out.println("ID: 1 Price: 10.99 Quantity: 10 Name: Test Product");
-        System.out.println("ID: 2 Price: 2.99 Quantity: 20 Name: Test Product 2");
+        System.out.println("ID: 1, Price: 10.99, Quantity: 10, Name: Test Product");
+        System.out.println("ID: 2, Price: 2.99, Quantity: 20, Name: Test Product 2");
 
         System.out.println();
 
@@ -80,7 +81,7 @@ public class WarehouseTest {
         assert Warehouse.instance().getClientById("1").isPresent();
         System.out.println(Warehouse.instance().getClientById("1").get());
         System.out.println("Expected:");
-        System.out.println("id: 1 Name: Test Client Address: Test Address");
+        System.out.println("ID: 1, Name: Test Client, Address: Test Address");
 
         System.out.println();
 
@@ -90,7 +91,7 @@ public class WarehouseTest {
         assert Warehouse.instance().getProductById("1").isPresent();
         System.out.println(Warehouse.instance().getProductById("1").get());
         System.out.println("Expected:");
-        System.out.println("ID: 1 Name: Test Product Price: 10.99 Quantity: 10");
+        System.out.println("ID: 1, Price: 10.99, Quantity: 10, Name: Test Product");
 
         System.out.println();
 

@@ -1,3 +1,4 @@
+
 public class ClientTest {
 
     private static void printWishlist(Wishlist wl) {
@@ -14,7 +15,7 @@ public class ClientTest {
         System.out.println("Client id: " + client.getId() + ", expected: 1");
         System.out.println("Client name: " + client.getName() + ", expected: John Doe");
         System.out.println("Client address: " + client.getAddress() + ", expected: Test Address");
-        System.out.println("Client toString: " + client + "\n\texpected: id: 1 Name: John Doe Address: Test Address");
+        System.out.println("Client toString: " + client + "\n\tID: 1, Name: John Doe, Address: Test Address");
         System.out.println();
         System.out.println("Adding product to wishlist with id 1 and quantity 2");
         client.addToWishlist("1", 2);

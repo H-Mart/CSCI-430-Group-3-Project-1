@@ -1,3 +1,4 @@
+
 public class WishlistItemTest {
     public static void runTest() {
         System.out.println("---------- Begin WishlistItem Test ----------");
